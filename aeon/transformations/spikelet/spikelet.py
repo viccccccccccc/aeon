@@ -1,0 +1,140 @@
+import numpy as np
+import scipy.io
+
+from aeon.transformations.spikelet.spikelet_params import Spikelet_MpParam_generate_ver_02
+from aeon.transformations.spikelet.spikelet_approx import Spikelet_aproximation_ver_03
+from aeon.transformations.spikelet.spikelet_char_query import Spikelet_Char_query
+from aeon.transformations.spikelet.spikelet_word_query import Spikelet_Word_query
+from aeon.transformations.spikelet.spikelet_matprof import Spikelet_MP_new_ver_02
+
+
+# Define a class for Spikelet algorithm parameters
+class AlgParam:
+    def __init__(self):
+        self.DataName = 'psyllid'
+        self.DataColumn = 1
+        self.query = ['B']
+        self.supp_max = 200
+        self.supp_min = 50
+        self.operation_sequence = ['restrictSupportByWindowLength', 'reduceSpikeByMagnitude', 'restrictSupportByMagnitudeRatioInitial']
+        self.magnitude_ratio = 0
+        self.symbol_mapping_rule = [
+            {'condition': 'Type == 2 and SuppCBM_100 >= 50', 'symbol': 'B'},
+            {'condition': 'Type == 2 and SuppCBM_100 < 50', 'symbol': 'A'}
+        ]
+        self.symbol_mapping_argument = [2, "SuppCBM_100", 50, ["B", "A"]]
+
+def print_structure(d, indent=0):
+    """Recursively prints the structure of a dictionary."""
+    for key, value in d.items():
+        print(' ' * indent + str(key) + ':', end=' ')
+        if isinstance(value, dict):
+            print()
+            print_structure(value, indent + 2)
+        elif isinstance(value, list):
+            print('[', end='')
+            print(', '.join(str(type(i)) for i in value), end=']\n')
+        else:
+            print(type(value))
+
+def Spikelet_exec(D, AlgParam, EnvParam):
+    DataFileName = AlgParam.DataFileName if hasattr(AlgParam, 'DataFileName') else AlgParam.DataName
+    Thr_Str = ""#get_Thr_Str(AlgParam) es hat bei dieser methode einen fehler gegeben, methode brauche ich aber gerade eh nicht
+
+    # Optional: Omit the following if no file output is needed
+    MagInfo_File = EnvParam.get('MagInfo_File', f'MagInfo_{DataFileName}_{Thr_Str}.mat')
+    MagInfoOutput_ON = EnvParam.get('MagInfoOutput_ON', False)
+    Test_ON = EnvParam.get('Test_ON', False)
+    CalcMp_ON = getattr(AlgParam, 'CalcMp_ON', True)        #getattr() weil AlgParam keine .get() funktion hat. EnvParam ist anscheinend ein Dictionary
+    Plot_ON = EnvParam.get('Plot_ON', False)
+
+    if not CalcMp_ON:
+        Plot_ON = False
+
+    Param = Spikelet_MpParam_generate_ver_02(AlgParam)
+    #print_structure(Param)
+    MagInfo = Spikelet_aproximation_ver_03(D, Param)
+
+    # Optional: Keep if you need to print or log symbols
+    MagInfo['dataname'] = DataFileName
+    MagInfo = Spikelet_Char_query(MagInfo)
+    print_char_symbol(MagInfo)
+    MagInfo, QueryRslt = Spikelet_Word_query(MagInfo, Param.query)
+    print_word_symbol(MagInfo)
+
+    if CalcMp_ON:
+        MagInfo, MpRslt = Spikelet_MP_new_ver_02(MagInfo, Param)
+        MagInfo, MpNnEach = Spikelet_MP_new_ver_02(MagInfo, Param)
+
+    if Plot_ON:
+        Spikelet_MP_plot_all(MagInfo, EnvParam)
+
+    if MagInfoOutput_ON:
+        MagInfo_Path = f"{EnvParam['SpreadSheet_Dir']}/{MagInfo_File}"
+        np.save(MagInfo_Path, MagInfo)
+
+    TestRslt = None
+
+    if Test_ON:
+        MagInfo_standard_Path = f"{EnvParam['SpreadSheet_Standard_Dir']}/{MagInfo_File}"
+        MagInfo_standard = np.load(MagInfo_standard_Path, allow_pickle=True).item()
+        TestRslt = MagInfo == MagInfo_standard
+
+    return MagInfo, TestRslt, Param
+
+
+
+"""def get_Thr_Str(AlgParam):
+    M_Str = f"m{AlgParam['magnitude_threshold']}" if 'magnitude_threshold' in AlgParam else ""
+    C_Str = f"c{AlgParam['constant_length_threshold']}" if 'constant_length_threshold' in AlgParam else ""
+    if not M_Str and not C_Str:
+        return "auto"
+    return f"{M_Str}_{C_Str}".replace('.', 'p')"""
+
+def print_char_symbol(MagInfo):
+    SpikeDb = MagInfo['spikeDb']
+    CMS_str = SpikeDb['alphabet']
+    for i, char in enumerate(CMS_str, start=1):
+        if i % 5 == 1:
+            from_idx = i
+            print(f"{i}: ", end="")
+        print(char, end="")
+        if i % 5 == 0 or i == len(CMS_str):
+            to_idx = i
+            print(f" {from_idx}-{to_idx}")
+
+def print_word_symbol(MagInfo):
+    CMS_str = MagInfo['spikeDb']['alphabet']
+    QR = MagInfo['word_query_result']
+    Names = QR['string_query_names']
+    for q_id, SQ in enumerate(QR['string_query'], start=1):
+        pattern = QR['query'][q_id - 1]['pattern']
+        print(f"\n[qid = {q_id}] {pattern}")
+        for row in SQ:
+            local_id = row[Names == "local_id"]
+            from_idx = row[Names == "from"]
+            to_idx = row[Names == "to"]
+            start_spike = row[Names == "start_spike_id"]
+            string_length = row[Names == "string_length"]
+            end_spike = start_spike + string_length - 1
+            symbol_rep = CMS_str[start_spike - 1:end_spike]
+            print(f"[{local_id}] {symbol_rep} ({from_idx}:{to_idx})")
+
+def Spikelet_MP_plot_all(MagInfo, EnvParam):
+    pass
+
+# Main function to perform motif discovery
+def motif_discovery_and_clasp(X):
+    print("------------------WE BACK IN THIS BIHHH-----------------")
+
+    # Initialize parameters
+    env_param = {}
+    alg_param = AlgParam()
+
+    # Execute Spikelet algorithm
+    MagInfo, TestRslt, Param = Spikelet_exec(X, alg_param, env_param)
+
+    # Transformed data after Spikelet (placeholder for actual transformed data)
+    transformed_data = MagInfo['data_org']  # This should be the actual transformed data
+    
+    return transformed_data

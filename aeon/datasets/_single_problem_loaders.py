@@ -19,6 +19,8 @@ __all__ = [
     "load_uschange",
     "load_PBS_dataset",
     "load_gun_point_segmentation",
+    "load_psyllid_segmentation",
+    "load_psyllid_reduced_segmentation",
     "load_electric_devices_segmentation",
     "load_macroeconomic",
     "load_unit_test_tsf",
@@ -28,6 +30,7 @@ __all__ = [
 import os
 from urllib.error import HTTPError, URLError
 from warnings import warn
+from scipy.io import loadmat
 
 import numpy as np
 import pandas as pd
@@ -748,6 +751,74 @@ def load_gun_point_segmentation():
 
     path = os.path.join(MODULE, DIRNAME, dir, fname)
     ts = pd.read_csv(path, index_col=0, header=None).squeeze("columns")
+
+    return ts, period_length, change_points
+
+def load_psyllid_segmentation():
+    """
+    Load the Psyllid time series segmentation dataset from a .mat file and return ts.
+
+    Returns
+    -------
+    X : pd.Series
+        Single time series for segmentation
+    period_length : int
+        Annotated period length (example value)
+    change_points : numpy arrayF
+        Change points annotated within the dataset (example values)
+    """
+    dir = "segmentation"
+    name = "psyllid"
+    fname = name + ".mat"
+
+    period_length = int(10)  # This is an example; adjust based on your data
+    change_points = np.int32([100, 200, 300])  # Example change points; literally chosen arbitrarily
+
+    path = os.path.join(MODULE, DIRNAME, dir, fname)
+
+    # Load the .mat file
+    mat_data = loadmat(path)
+
+    # Assuming the data is stored under the key 'data'
+    # Adjust the key based on the actual content of your .mat file
+    ts_data = mat_data['data'].squeeze()
+
+    # Convert the data to a pandas Series
+    ts = pd.Series(ts_data)
+
+    return ts, period_length, change_points
+
+def load_psyllid_reduced_segmentation():
+    """
+    Load the reduced Psyllid time series segmentation dataset from a .mat file and return ts.
+
+    Returns
+    -------
+    X : pd.Series
+        Single time series for segmentation
+    period_length : int
+        Annotated period length (example value)
+    change_points : numpy arrayF
+        Change points annotated within the dataset (example values)
+    """
+    dir = "segmentation"
+    name = "psyllid_reduced"
+    fname = name + ".mat"
+
+    period_length = int(10)  # This is an example; adjust based on your data
+    change_points = np.int32([100, 200, 300])  # Example change points; literally chosen arbitrarily
+
+    path = os.path.join(MODULE, DIRNAME, dir, fname)
+
+    # Load the .mat file
+    mat_data = loadmat(path)
+
+    # Assuming the data is stored under the key 'data'
+    # Adjust the key based on the actual content of your .mat file
+    ts_data = mat_data['data'].squeeze()
+
+    # Convert the data to a pandas Series
+    ts = pd.Series(ts_data)
 
     return ts, period_length, change_points
 
