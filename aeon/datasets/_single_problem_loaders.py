@@ -30,10 +30,10 @@ __all__ = [
 import os
 from urllib.error import HTTPError, URLError
 from warnings import warn
-from scipy.io import loadmat
 
 import numpy as np
 import pandas as pd
+from scipy.io import loadmat
 
 from aeon.datasets import load_from_tsf_file
 from aeon.datasets._data_loaders import _load_saved_dataset, _load_tsc_dataset
@@ -754,6 +754,7 @@ def load_gun_point_segmentation():
 
     return ts, period_length, change_points
 
+
 def load_psyllid_segmentation():
     """
     Load the Psyllid time series segmentation dataset from a .mat file and return ts.
@@ -772,7 +773,9 @@ def load_psyllid_segmentation():
     fname = name + ".mat"
 
     period_length = int(10)  # This is an example; adjust based on your data
-    change_points = np.int32([100, 200, 300])  # Example change points; literally chosen arbitrarily
+    change_points = np.int32(
+        [100, 200, 300]
+    )  # Example change points; literally chosen arbitrarily
 
     path = os.path.join(MODULE, DIRNAME, dir, fname)
 
@@ -781,12 +784,13 @@ def load_psyllid_segmentation():
 
     # Assuming the data is stored under the key 'data'
     # Adjust the key based on the actual content of your .mat file
-    ts_data = mat_data['data'].squeeze()
+    ts_data = mat_data["data"].squeeze()
 
     # Convert the data to a pandas Series
     ts = pd.Series(ts_data)
 
     return ts, period_length, change_points
+
 
 def load_psyllid_reduced_segmentation():
     """
@@ -806,7 +810,9 @@ def load_psyllid_reduced_segmentation():
     fname = name + ".mat"
 
     period_length = int(10)  # This is an example; adjust based on your data
-    change_points = np.int32([100, 200, 300])  # Example change points; literally chosen arbitrarily
+    change_points = np.int32(
+        [100, 200, 300]
+    )  # Example change points; literally chosen arbitrarily
 
     path = os.path.join(MODULE, DIRNAME, dir, fname)
 
@@ -815,7 +821,7 @@ def load_psyllid_reduced_segmentation():
 
     # Assuming the data is stored under the key 'data'
     # Adjust the key based on the actual content of your .mat file
-    ts_data = mat_data['data'].squeeze()
+    ts_data = mat_data["data"].squeeze()
 
     # Convert the data to a pandas Series
     ts = pd.Series(ts_data)

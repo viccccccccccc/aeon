@@ -2,7 +2,8 @@ import numpy as np
 from scipy.interpolate import interp1d
 
 DEBUG_FIND_LR = 0  # Debug flag
-LEG_MAXIMAL_CONVEX_AMPLITUDE_2_SUPPORT_ON = True  # Global condition flag
+LEG_MAXIMAL_CONVEX_AMPLITUDE_2_SUPPORT_ON = False  # Global condition flag
+LEG_WINDOW_LENGTH_ON = False
 
 def Spikelet_generateInitialSpikelet(X, RightWindowLength=np.inf):
     """
@@ -131,6 +132,9 @@ def Leg_find_left(X, from_idx, to, to_short):
     Returns:
     int: The index where the condition is first met.
     """
+    if (from_idx == 1):
+        print(f"leg find left from_idx: {from_idx}, to: {to}, to_short: {to_short}")
+
     if DEBUG_FIND_LR == 1:
         print(f'[leg_find_left] (from: {from_idx}, to: {to}, to_short: {to_short})')
 
@@ -188,6 +192,8 @@ def Leg_find_right(X, from_idx, to, to_short):
     Returns:
     int: The index where the condition is first met.
     """
+    if (from_idx == 1):
+        print(f"leg find right from_idx: {from_idx}, to: {to}, to_short: {to_short}")
 
     if DEBUG_FIND_LR == 1:
         print(f'[leg_find_right] (from: {from_idx}, to: {to}, to_short: {to_short})')
@@ -241,10 +247,15 @@ def middle_leg_reduction(X, S, A, C, L, s1, s2, s3, s4):
 
     s3_sign = np.sign(X[s3] - X[s2])
     C[s3, :] = [s3_sign, s2, s4, s3_left, s3_right]
-    A[s3] = s3_sign * np.minimum(np.abs(X[s3] - X[s3_left]), np.abs(X[s3] - X[s3_right]))
+    if LEG_WINDOW_LENGTH_ON:
+        A[s3] = s3_sign * min(abs(X[s3] - X[s3_left]), abs(X[s3] - X[s3_right]))
+    else:
+        A[s3] = X[s3] - X[s2]
+
     L[s3] = s3_right - s3_left + 1
 
     # Spike s2
+    
     s2_right = s3
     s2_left = Leg_find_left(X, s2, s1, s3)
 

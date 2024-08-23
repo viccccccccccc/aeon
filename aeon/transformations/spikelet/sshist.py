@@ -1,20 +1,21 @@
 import numpy as np
 
+
 def sshist(x, N=None):
     """
     Function `sshist` returns the optimal number of bins in a histogram
     used for density estimation.
     """
-
+    
+    print("N ist: ", N)  # Prüfe, was N ist
     # Flatten x and compute basic statistics
     x = np.ravel(x)
     x_min = np.min(x)
     x_max = np.max(x)
-
     if N is None:
         buf = np.abs(np.diff(np.sort(x)))
         dx = np.min(buf[buf != 0])
-        N_MIN = 2              # Minimum number of bins (integer)
+        N_MIN = 2  # Minimum number of bins (integer)
         N_MAX = min(int(np.floor((x_max - x_min) / (2 * dx))), 50)
         N = np.arange(N_MIN, N_MAX + 1)
 
@@ -27,10 +28,14 @@ def sshist(x, N=None):
         shift = np.linspace(0, D[i], SN)
         for p in range(SN):
             # Bin edges considering the shift
-            edges = np.linspace(x_min + shift[p] - D[i] / 2,
-                                x_max + shift[p] - D[i] / 2, N[i] + 1)
+            edges = np.linspace(
+                x_min + shift[p] - D[i] / 2, x_max + shift[p] - D[i] / 2, N[i] + 1
+            )
 
             # Count number of events in bins
+
+            print("N ist: ", N)  # Prüfe, was N ist
+
             ki = np.histogram(x, bins=edges)[0]
 
             # Calculate mean and variance of event count

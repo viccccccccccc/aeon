@@ -14,4 +14,3 @@ save(save_path, 'reduced_data', 'name');
 load(save_path, 'reduced_data', 'name');
 data = reduced_data;
 save(save_path, 'data', 'name');
-
