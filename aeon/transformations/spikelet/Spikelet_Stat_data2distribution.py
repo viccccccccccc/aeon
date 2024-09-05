@@ -22,6 +22,9 @@ def Spikelet_Stat_data2distribution(D, Arg=None, StepDivLength=10):
     # Decide bin size
     BinSize, edges, BinListInfo = Spikelet_Stat_decide_binsize(D, BinMethod)
 
+    print(f"BinSize: {BinSize}, len edges: {len(edges)}, BinListInfo: {BinListInfo}")
+    print("")
+
     if Arg.get("edge_type") == "int":
         Edge_interval = np.ceil(BinSize)
     else:

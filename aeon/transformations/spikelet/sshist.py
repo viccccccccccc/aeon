@@ -5,9 +5,9 @@ def sshist(x, N=None):
     """
     Function `sshist` returns the optimal number of bins in a histogram
     used for density estimation.
+
+    !!!!!!!! WICHTIG: Die ausgerechneten Zahlen sind größtenteils richtig, aber können leicht nach paar Kommastellen abweichen!!!!!!!!!!!!!!!!!
     """
-    
-    print("N ist: ", N)  # Prüfe, was N ist
     # Flatten x and compute basic statistics
     x = np.ravel(x)
     x_min = np.min(x)
@@ -33,8 +33,6 @@ def sshist(x, N=None):
             )
 
             # Count number of events in bins
-
-            print("N ist: ", N)  # Prüfe, was N ist
 
             ki = np.histogram(x, bins=edges)[0]
 

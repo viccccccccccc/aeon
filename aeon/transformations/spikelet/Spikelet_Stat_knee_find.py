@@ -22,17 +22,10 @@ def Spikelet_Stat_knee_find(MagDist, Func, Weight=None):
     else:
         D2D_arg_weight = np.nan
 
-    print(
-        f"Func_fwd: {Func_fwd}, Dim_fwd: {Dim_fwd}, Func_bwd: {Func_bwd}, Dim_bwd: {Dim_bwd}"
-    )
-    print(
-        f"MagDist: {len(MagDist)}, D2D_arg_weight: {D2D_arg_weight}, StepDivLength: {StepDivLength}"
-    )
-
     # Spikelet_Stat_data2distribution needs to be defined
-    Y, X, BinSize, StepDivLength, BinListInfo = Spikelet_Stat_data2distribution(
-        MagDist, D2D_arg_weight, StepDivLength
-    )
+    Y, X, BinSize, StepDivLength, BinListInfo = Spikelet_Stat_data2distribution(MagDist, D2D_arg_weight, StepDivLength)
+
+    print(f"len(X): {len(X)}, len(Y): {len(Y)}, BinSize: {BinSize}, StepDivLength: {StepDivLength}, BinListInfo: {BinListInfo}")
 
     # islocalmin
     if Func_fwd == "islocalmin":
@@ -67,7 +60,13 @@ def Spikelet_Stat_knee_find(MagDist, Func, Weight=None):
 
     # Approximate function
     X_sorted = np.sort(X)
+
+    print(f"X_sorted len: {len(X_sorted)}")
+
     Knee_list = X_sorted[Dim_fwd:-Dim_bwd]
+
+    print(f"Knee list len: {len(Knee_list)}")
+
     Err = np.inf * np.ones_like(Knee_list)
 
     for i in range(len(Knee_list)):

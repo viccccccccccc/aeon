@@ -45,15 +45,7 @@ def Spikelet_Op_call_approximation(MagInfo):
         elif Op == "restrictSupportByWindowLength":
             MagInfo = Spikelet_restrictSupportByWindowLength(MagInfo)
 
-        elif Op == "restrictSupportByMagnitudeRatio":
-
-            indices = [167, 168, 169, 192, 8509, 45996, 114436]
-            for index in indices:
-                if index < len(MagInfo['magnitude']):
-                    print(f"Wert an Index {index}: {MagInfo['magnitude'][index]}")
-                else:
-                    print(f"Index {index} liegt außerhalb des gültigen Bereichs.")
-                    
+        elif Op == "restrictSupportByMagnitudeRatio":                    
             MagInfo = Spikelet_restrictSupportByMagnitudeRatio(MagInfo)
 
         elif Op == "restrictSupportByMagnitudeRatioInitial":
@@ -196,14 +188,12 @@ def Spikelet_restrictSupportByWindowLength(MagInfo):
     Right_new = Right.copy()
 
     # Find target times
-    Time = np.arange(1, len(Mag) + 1)
+    Time = np.arange(0, len(Mag))
     Supp_left = Time - Left + 1
     Supp_right = Right - Time + 1
 
     Index_M = eval(M_formula)
-    Index_MW = np.logical_or(
-        Index_M & (Supp_left > LeftSupportLength), (Supp_right > RightSupportLength)
-    )
+    Index_MW = np.logical_or(Index_M & (Supp_left > LeftSupportLength), (Supp_right > RightSupportLength))
     
     M_pos = np.where(Index_MW == True)[0]
 
@@ -211,11 +201,11 @@ def Spikelet_restrictSupportByWindowLength(MagInfo):
     for t in M_pos:
         if Supp_left[t] > LeftSupportLength:
             from_idx = max(t - LeftSupportLength + 1, 1)
-            left_val, left_rel = np.min(Data_org[from_idx - 1 : t] * np.sign(Mag[t])), np.argmin(Data_org[from_idx - 1 : t] * np.sign(Mag[t]))
-            Left_new[t] = from_idx + left_rel - 1
+            left_val, left_rel = np.min(Data_org[from_idx : t + 1] * np.sign(Mag[t])), np.argmin(Data_org[from_idx : t + 1] * np.sign(Mag[t]))
+            Left_new[t] = from_idx + left_rel
 
         if Supp_right[t] > RightSupportLength:
-            to = min(t + RightSupportLength - 1, len(Data_org) - 1)  # -1 da Python 0-basiert ist
+            to = min(t + RightSupportLength, len(Data_org))
             right_val, right_rel = np.min(Data_org[t:to] * np.sign(Mag[t])), np.argmin(Data_org[t:to] * np.sign(Mag[t]))
             Right_new[t] = t + right_rel
 
@@ -306,15 +296,7 @@ def Spikelet_restrictSupportByMagnitudeRatio(MagInfo):
     Right = MagInfo["right"]
 
     # Support restriction by magnitude (8 fields)
-
     Mag_new, Left_new, Right_new = support_restriction_by_magnitude_ratio(Data_org, Mag, Left, Right, ParamSRM)
-
-    indices = [167, 168, 169, 192, 8509, 45996, 114436]
-    for index in indices:
-            if index < len(Mag_new):
-                print(f"nach support_restriction_by_magnitude_ratio: Wert an Index {index}: {Mag_new[index]}")
-            else:
-                print(f"Index {index} liegt außerhalb des gültigen Bereichs.")
 
     # Revised fields (magnitude, left, right, leg_magnitude)
     MagInfo["magnitude"] = Mag_new
@@ -325,8 +307,6 @@ def Spikelet_restrictSupportByMagnitudeRatio(MagInfo):
     MagInfo = Spikelet_MagInfo_post_processing(MagInfo, OpName)
     MagInfo["output"][OpName]["magnitude_ratio_threshold"] = MRatio
     MagInfo["output"][OpName]["param_str"] = f"magnitude_ratio_threshold ={MRatio}"
-
-    
 
     # Debug
     if Debug_On:
@@ -376,11 +356,20 @@ def Spikelet_restrictSupportByMagnitudeRatio(MagInfo):
 
         plt.show()
 
+    
+    #Um Arrays zu speichern:
+    file_path = r'C:\Users\Victor\Desktop\Uni\Bachelor\stuff\MagInfo.npy'
+
+    # Save the array to the specified path
+    np.save(file_path, MagInfo['magnitude'])
+
+    print(f"Array saved to {file_path}")
+    
+
     return MagInfo
 
 
 def support_restriction_by_magnitude_ratio(Data_org, Mag_org, Left_org, Right_org, ParamSRM):
-    print("**************************************")
     MRatio = ParamSRM["magnitude_ratio"]
 
     Supp = np.column_stack((Left_org, Right_org))
@@ -399,12 +388,7 @@ def support_restriction_by_magnitude_ratio(Data_org, Mag_org, Left_org, Right_or
     # Find positions where Mag_org is not zero
     M_pos = np.where(Mag_org != 0)[0]
 
-    indices_to_check = [167, 168, 169, 192, 8509, 45996, 114436]
-
     for t in M_pos:
-        if t in indices_to_check:
-            print(f"\nIndex {t}:")
-            print(f"Original Mag[t]: {Mag_org[t]}")
         # Find left terminal
         Mag_org_rel = Mag_org[Supp[t, 0] : t]
 
@@ -418,12 +402,6 @@ def support_restriction_by_magnitude_ratio(Data_org, Mag_org, Left_org, Right_or
             left_val, left_rel = np.min(Data_org[left_boundary:t] * np.sign(Mag_org[t])), np.argmin(Data_org[left_boundary:t] * np.sign(Mag_org[t]))
             Left[t] = left_boundary + left_rel
 
-            if t in indices_to_check:
-                print(f"Left terminal found:")
-                print(f"  left_boundary: {left_boundary}")
-                print(f"  left_val: {left_val}, left_rel: {left_rel}")
-                print(f"  New Left[t]: {Left[t]}")
-
         # Find right terminal
         Mag_org_rel = Mag_org[t + 1 : Supp[t, 1]]
 
@@ -433,14 +411,8 @@ def support_restriction_by_magnitude_ratio(Data_org, Mag_org, Left_org, Right_or
             right_boundary_rel = right_boundary_rel[0]
             right_mag = t + 1 + right_boundary_rel
             right_boundary = Left_org[right_mag]
-            right_val, right_rel = np.min(Data_org[t:right_boundary] * np.sign(Mag_org[t])), np.argmin(Data_org[t:right_boundary] * np.sign(Mag_org[t]))
-            Right[t] = t + 1 + right_rel
-
-            if t in indices_to_check:
-                print(f"Right terminal found:")
-                print(f"  right_boundary: {right_boundary}")
-                print(f"  right_val: {right_val}, right_rel: {right_rel}")
-                print(f"  New Right[t]: {Right[t]}")
+            right_val, right_rel = np.min(Data_org[t:right_boundary + 1] * np.sign(Mag_org[t])), np.argmin(Data_org[t:right_boundary + 1] * np.sign(Mag_org[t]))
+            Right[t] = t + right_rel
 
     # Ensure Mag_left and Mag_right have the same shape
     Mag_left = Data_org - Data_org[Left]
@@ -448,15 +420,6 @@ def support_restriction_by_magnitude_ratio(Data_org, Mag_org, Left_org, Right_or
 
     # Revise magnitude with the same length as the original Mag_org
     Mag = np.sign(Mag_left) * np.minimum(np.abs(Mag_left), np.abs(Mag_right))
-
-    for t in indices_to_check:
-        if t < len(Mag):
-            print(f"\nFinal Values for Index {t}:")
-            print(f"  Mag_left: {Mag_left[t]}")
-            print(f"  Mag_right: {Mag_right[t]}")
-            print(f"  Final Mag[t]: {Mag[t]}")
-        else:
-            print(f"Index {t} is out of bounds for the calculated arrays.")
 
     return Mag, Left, Right
 

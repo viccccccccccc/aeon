@@ -9,8 +9,6 @@ from aeon.transformations.spikelet.Spikelet_Stat_knee_find import (
 
 
 def Spikelet_Stat_knee_find_2nd_zerocross(MagDist, FuncList, Weight=None):
-    print("MagDist in Spikelet_Stat_knee_find_2nd_zerocross: ", len(MagDist))
-
     DEBUG = False
     PAPER = False
 
@@ -23,17 +21,13 @@ def Spikelet_Stat_knee_find_2nd_zerocross(MagDist, FuncList, Weight=None):
 
     t_1 = time.time()
     t_1_name = "first_knee_opt"
-    KneeOpt_1, Info_1, BinListInfo_1 = Spikelet_Stat_knee_find(
-        MagDist, FuncList[0], Weight
-    )
+    KneeOpt_1, Info_1, BinListInfo_1 = Spikelet_Stat_knee_find(MagDist, FuncList[0], Weight)
     t_1end = time.time() - t_1
 
     t_2 = time.time()
     t_2_name = "second_knee_opt"
     MagDist_2 = MagDist[MagDist >= KneeOpt_1]
-    KneeOpt_2, Info_2, BinListInfo_2 = Spikelet_Stat_knee_find(
-        MagDist_2, FuncList[1], Weight
-    )
+    KneeOpt_2, Info_2, BinListInfo_2 = Spikelet_Stat_knee_find(MagDist_2, FuncList[1], Weight)
     t_2end = time.time() - t_2
 
     t_3 = time.time()

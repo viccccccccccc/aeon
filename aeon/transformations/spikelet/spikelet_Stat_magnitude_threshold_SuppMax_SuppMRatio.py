@@ -67,32 +67,18 @@ def Spikelet_Stat_magnitude_threshold_SuppMax_SuppMRatio(MagInfo, ParamMagThr):
     Mag_selected = np.abs(Mag[Mag_index])
     Supp_selected = Supp[Mag_index]
 
-    save_directory = r'C:\Users\Victor\Desktop\Uni\Bachelor\stuff'
+    file_path = r'C:\Users\Victor\Desktop\Uni\Bachelor\stuff\Mag_selected.npy'
 
-    # Make sure the directory exists; if not, create it
-    os.makedirs(save_directory, exist_ok=True)
+    # Save the array to the specified path
+    np.save(file_path, Mag_selected)
 
-    # Save the file
-    np.save(os.path.join(save_directory, 'Mag_index.npy'), Mag_index)
-
-    print(f"Mag len: {len(Mag)}, Mag_index len: {len(Mag_index)}")
-    print(f"Mag_selected len: {len(Mag_selected)}, Supp_selected len: {len(Supp_selected)}")
-
-    print(f"in magnitude threshold: Mag[167] = {Mag[167]}")
-    print(f"Mag[168] = {Mag[168]}")
-    print(f"Mag[169] = {Mag[169]}")
-    print(f"Mag[192] = {Mag[192]}")
-    print(f"Mag[8509] = {Mag[8509]}")
-    print(f"Mag[45996] = {Mag[45996]}")
-    print(f"Mag[114436] = {Mag[114436]}")
+    print(f"Array saved to {file_path}")    
 
     # Find knee
     if Type == "simple":
         MagThr, Info_S = Spikelet_Stat_knee_find_repeat(Mag_selected, Func)
     elif Type == "2nd_under_heuristics":
-        MagThr, KneeInfo = Spikelet_Stat_knee_find_double_2nd_under_heuristics(
-            Mag_selected, Func
-        )
+        MagThr, KneeInfo = Spikelet_Stat_knee_find_double_2nd_under_heuristics(Mag_selected, Func)
     elif Type == "2nd_zerocross":
         MagThr, KneeInfo = Spikelet_Stat_knee_find_2nd_zerocross(Mag_selected, Func)
     elif Type == "magband_support":
