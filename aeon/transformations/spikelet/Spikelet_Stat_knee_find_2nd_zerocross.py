@@ -24,11 +24,30 @@ def Spikelet_Stat_knee_find_2nd_zerocross(MagDist, FuncList, Weight=None):
     KneeOpt_1, Info_1, BinListInfo_1 = Spikelet_Stat_knee_find(MagDist, FuncList[0], Weight)
     t_1end = time.time() - t_1
 
+    # file_path = r'C:\Users\Victor\Desktop\Uni\Bachelor\stuff\Info_1.npy'
+
+    # # Save the array to the specified path
+    # np.save(file_path, Info_1)
+
+    # print(f"bwd_model = {Info_1["bwd_model"]}")
+    # print(f"Array saved to {file_path}")
+
+    # #raise SystemExit("Stopping the program with SystemExit.")
+
     t_2 = time.time()
     t_2_name = "second_knee_opt"
     MagDist_2 = MagDist[MagDist >= KneeOpt_1]
     KneeOpt_2, Info_2, BinListInfo_2 = Spikelet_Stat_knee_find(MagDist_2, FuncList[1], Weight)
     t_2end = time.time() - t_2
+
+    # file_path = r'C:\Users\Victor\Desktop\Uni\Bachelor\stuff\Info_2.npy'
+
+    # # Save the array to the specified path
+    # np.save(file_path, Info_2)
+
+    # print(f"bwd_model = {Info_2["bwd_model"]}")
+    # print(f"Array saved to {file_path}")
+    # raise SystemExit("Stopping the program with SystemExit.")
 
     t_3 = time.time()
     t_3_name = "zerocross"
@@ -36,7 +55,7 @@ def Spikelet_Stat_knee_find_2nd_zerocross(MagDist, FuncList, Weight=None):
     fwd_model_2 = Info_2["fwd_model"]
     X_fwd = Info_2["X_fwd"]
     Y_fwd = Info_2["Y_fwd"]
-    Opt_fwd = Info_2["opt"][:, 1]
+    Opt_fwd = Info_2['opt'][:len(Y_fwd), 1]
     KneeOpt_zerocross_ref, InOut = zerocross_inout_region(Y_fwd, Opt_fwd)
     KneeOpt_zerocross = X_fwd[KneeOpt_zerocross_ref]
     t_3end = time.time() - t_3
@@ -110,8 +129,8 @@ def zerocross_inout_region(V, Pred):
     if len(InOut) > 0:
         Min = 0
         for i in range(len(InOut)):
-            min_i = np.min(Vn[int(InOut[i, 0]) : int(InOut[i, 1])])
-            pos_i = np.argmin(Vn[int(InOut[i, 0]) : int(InOut[i, 1])])
+            min_i = np.min(Vn[int(InOut[i, 0]): int(InOut[i, 1]) + 1])
+            pos_i = np.argmin(Vn[int(InOut[i, 0]) : int(InOut[i, 1]) + 1])
             if min_i < Min:
                 KneeOpt_rel = int(InOut[i, 0]) + pos_i
                 Min = min_i

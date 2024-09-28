@@ -29,23 +29,18 @@ def calcnbins(x, method='middle', minimum=1, maximum=np.inf):
 
     # Perform the calculation
     if method == 'fd':
-        print("fd")
         nbins = calcfd(x)
     elif method == 'scott':
-        print("scott")
         nbins = calcscott(x)
     elif method == 'sturges':
-        print("sturges")
         nbins = calcsturges(x)
     elif method == 'all':
-        print("all")
         nbins = {
             'fd': calcfd(x),
             'scott': calcscott(x),
             'sturges': calcsturges(x),
         }
     elif method == 'middle':
-        print("middle")
         nbins = np.median([calcfd(x), calcscott(x), calcsturges(x)])
 
     # Constrain nbins within the specified range
@@ -70,7 +65,6 @@ def calcfd(x):
         h = 2 * np.median(np.abs(x - np.median(x)))  # Twice the median absolute deviation
     if h > 0:
         nbins = np.ceil((x.max() - x.min()) / (2 * h * len(x) ** (-1 / 3)))
-        print("sollte nbins sein: ", nbins)
     else:
         nbins = 1
     return int(nbins)

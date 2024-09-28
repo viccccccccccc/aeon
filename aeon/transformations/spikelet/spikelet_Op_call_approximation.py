@@ -21,7 +21,7 @@ def Spikelet_Op_call_approximation(MagInfo):
     InitialOpName = "generateInitialSpikelet"
     Ops = MagInfo["param"]["operation"]["operation_sequence"]
 
-    # print_keys(MagInfo)
+    print_keys(MagInfo)
 
     for Op in Ops:
         print("OP: ", Op)
@@ -114,9 +114,7 @@ def Spikelet_Op_reduceSpikeByMagnitude(MagInfo):
         elif METHOD_auto == "SuppMax-SuppMRatio":
             MagInfo_tmp = Spikelet_Op_call_approximation(MagInfo_tmp)
 
-            MagThr, MagDist, MagInfo_auto, KneeInfo = (
-                Spikelet_Stat_magnitude_threshold_SuppMax_SuppMRatio(MagInfo_tmp, Param_Auto)
-            )
+            MagThr, MagDist, MagInfo_auto, KneeInfo = (Spikelet_Stat_magnitude_threshold_SuppMax_SuppMRatio(MagInfo_tmp, Param_Auto))
 
         Query = f"abs(Mag) > {MagThr}"
     else:
@@ -150,6 +148,20 @@ def Spikelet_Op_reduceSpikeByMagnitude(MagInfo):
         MagInfo["output"][OpName]["magnitude_threshold_kneeInfo"] = KneeInfo
 
     return MagInfo
+
+def Spikelet_eval_query(Query, MagInfo):
+    Mag = MagInfo['magnitude']
+    Mag_index = np.where(Mag != 0)[0]
+    
+    Val = MagInfo['value']
+    Supp = MagInfo['right'] - MagInfo['left'] + 1
+    
+    Q_index = eval(Query)
+    Q_time = np.where(Q_index == True)[0]
+    
+    Reduced_time = np.setdiff1d(MagInfo['center'], Q_time)
+
+    return Q_time, Reduced_time
 
 
 def Spikelet_reduceSpikeByMagnitudeRatio(MagInfo):
@@ -355,16 +367,6 @@ def Spikelet_restrictSupportByMagnitudeRatio(MagInfo):
         plt.ylim(SuppRange)
 
         plt.show()
-
-    
-    #Um Arrays zu speichern:
-    file_path = r'C:\Users\Victor\Desktop\Uni\Bachelor\stuff\MagInfo.npy'
-
-    # Save the array to the specified path
-    np.save(file_path, MagInfo['magnitude'])
-
-    print(f"Array saved to {file_path}")
-    
 
     return MagInfo
 

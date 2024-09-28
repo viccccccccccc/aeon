@@ -104,5 +104,28 @@ def Spikelet_Stat_magnitude_threshold_SuppMax_SuppMRatio(MagInfo, ParamMagThr):
     else:
         print(f"[{Func}] type ({Type}) is not implemented")
         return None, None, MagInfo, KneeInfo
+    
 
+    print(f"MagThr = {MagThr}, ")
+
+    file_path = r'C:\Users\Victor\Desktop\Uni\Bachelor\stuff\Mag_selected.npy'
+    
+    # Save the array to the specified path
+    np.save(file_path, Mag_selected)
+
+    print(f"Array saved to {file_path}")
+
+    file_path = r'C:\Users\Victor\Desktop\Uni\Bachelor\stuff\MagInfo.npy'
+
+    # Save the array to the specified path
+    np.save(file_path, MagInfo)
+
+    print(f"Array saved to {file_path}")
+
+    file_path = r'C:\Users\Victor\Desktop\Uni\Bachelor\stuff\KneeInfo.npy'
+
+    # Save the array to the specified path
+    np.save(file_path, KneeInfo)
+
+    print(f"Array saved to {file_path}")
     return MagThr, Mag_selected, MagInfo, KneeInfo

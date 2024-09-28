@@ -1,5 +1,6 @@
 import numpy as np
 import scipy.io
+import pdb
 
 from aeon.transformations.spikelet.spikelet_approx import Spikelet_aproximation_ver_03
 from aeon.transformations.spikelet.spikelet_char_query import Spikelet_Char_query
@@ -66,7 +67,10 @@ def Spikelet_exec(D, AlgParam, EnvParam):
         Plot_ON = False
 
     Param = Spikelet_MpParam_generate_ver_02(AlgParam)
-    # print_structure(Param)
+    for x in Param["operation"]["operation_sequence"]:
+        print("vals: ", x)
+    print_structure(Param)
+    print("-------------------------------------------")
     MagInfo = Spikelet_aproximation_ver_03(D, Param)
 
     # Optional: Keep if you need to print or log symbols
@@ -149,6 +153,7 @@ def motif_discovery_and_clasp(X):
     alg_param = AlgParam()
 
     # Execute Spikelet algorithm
+    pdb.set_trace()
     MagInfo, TestRslt, Param = Spikelet_exec(X, alg_param, env_param)
 
     # Transformed data after Spikelet (placeholder for actual transformed data)

@@ -1,5 +1,8 @@
 import matplotlib.pyplot as plt
 import numpy as np
+from scipy.stats import norm
+import scipy.io
+import os
 
 from aeon.transformations.spikelet.Spikelet_Stat_data2distribution import (
     Spikelet_Stat_data2distribution,
@@ -25,7 +28,16 @@ def Spikelet_Stat_knee_find(MagDist, Func, Weight=None):
     # Spikelet_Stat_data2distribution needs to be defined
     Y, X, BinSize, StepDivLength, BinListInfo = Spikelet_Stat_data2distribution(MagDist, D2D_arg_weight, StepDivLength)
 
-    print(f"len(X): {len(X)}, len(Y): {len(Y)}, BinSize: {BinSize}, StepDivLength: {StepDivLength}, BinListInfo: {BinListInfo}")
+    base_path = r'C:\Users\Victor\Desktop\Uni\Bachelor\stuff'
+
+    if len(MagDist) != 62744:
+        file_path = os.path.join(base_path, f'vorlage_Y.mat')
+    else:
+        file_path = os.path.join(base_path, f'vorlage_Y2.mat')
+    
+    mat_data = scipy.io.loadmat(file_path)
+    Y = mat_data["Y"].squeeze()
+    print(f"----------------------Array 'Y' successfully loaded in Spikelet_Stat_knee_find----------------------")
 
     # islocalmin
     if Func_fwd == "islocalmin":
@@ -61,11 +73,7 @@ def Spikelet_Stat_knee_find(MagDist, Func, Weight=None):
     # Approximate function
     X_sorted = np.sort(X)
 
-    print(f"X_sorted len: {len(X_sorted)}")
-
-    Knee_list = X_sorted[Dim_fwd:-Dim_bwd]
-
-    print(f"Knee list len: {len(Knee_list)}")
+    Knee_list = X_sorted[Dim_fwd:-(1 + Dim_bwd)]
 
     Err = np.inf * np.ones_like(Knee_list)
 
@@ -73,9 +81,12 @@ def Spikelet_Stat_knee_find(MagDist, Func, Weight=None):
         breakpt = Knee_list[i]
         Fwd_index = X <= breakpt
         MD_index = MagDist <= breakpt
-        X_fwd, Y_fwd = X[Fwd_index], Y[Fwd_index]
-        X_bwd, Y_bwd = X[~Fwd_index], Y[~Fwd_index]
-        MD_fwd, MD_bwd = MagDist[MD_index], MagDist[~MD_index]
+        X_fwd = X[Fwd_index]
+        Y_fwd = Y[Fwd_index]
+        X_bwd = X[~Fwd_index]
+        Y_bwd = Y[~Fwd_index]
+        MD_fwd = MagDist[MD_index]
+        MD_bwd = MagDist[~MD_index]
 
         YE_fwd, P_fwd = apploximate_XY_or_MD(X_fwd, Y_fwd, MD_fwd, Func_fwd, Dim_fwd)
         YE_bwd, P_bwd = apploximate_XY_or_MD(X_bwd, Y_bwd, MD_bwd, Func_bwd, Dim_bwd)
@@ -85,8 +96,6 @@ def Spikelet_Stat_knee_find(MagDist, Func, Weight=None):
             Err[i] = np.sum(np.abs(YE - Y))
         elif ErrFunc == "l2":
             Err[i] = np.sum((YE - Y) ** 2)
-
-    print("Err ist: ", Err)
 
     opt_error = np.min(Err)
     opt_pos = np.argmin(Err)
@@ -217,10 +226,9 @@ def apploximate_XY_or_MD(X, Y, MD, Func, Dim):
         YE = np.polyval(P, X)
     elif Func == "normal":
         if len(MD) > 3:
-            from scipy.stats import norm
-
             P = norm.fit(MD)
-            YE = norm.pdf(X, *P)
+            distribution = norm(loc=P[0], scale=P[1])
+            YE = distribution.pdf(X)
         else:
             P = np.polyfit(X, Y, 0)
             YE = np.polyval(P, X)

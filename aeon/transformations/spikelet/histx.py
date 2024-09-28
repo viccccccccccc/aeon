@@ -1,6 +1,9 @@
 import matplotlib.pyplot as plt
+import numpy as np
 
 from aeon.transformations.spikelet.calcbins import calcnbins
+
+#WICHTIG!!!!!!!!!!! die histogram funktion rechnet leicht unterschiedliche werte als von der MatLab hist funktion aus. evtl muss die matlab hist funktion implementiert werden
 
 def histx(y, nbins=None, minimum=None, maximum=None):
     if nbins is None:
@@ -11,7 +14,6 @@ def histx(y, nbins=None, minimum=None, maximum=None):
     else:
         # If nbins is a string (method), we calculate the number of bins
         calculated_nbins = calcnbins(y, nbins, minimum, maximum)
-        print(f"calculated_nbins: {calculated_nbins}")
 
     if isinstance(nbins, str) and nbins == 'all':
         # Plot histograms for each method if 'all' is specified
@@ -26,8 +28,11 @@ def histx(y, nbins=None, minimum=None, maximum=None):
         return None, None
     else:
         # Standard case: plot or return histogram data
-        n, bins, patches = plt.hist(y, bins=calculated_nbins)
-        print(f"n: {len(n)}, bins: {len(bins)}")
+
+        bins = np.linspace(np.min(y), np.max(y), calculated_nbins + 1)
+        xout = bins[:-1] + np.diff(bins) / 2
+        n, _ = np.histogram(y, bins=bins)
+
         #plt.show()
-        return n, bins
+        return n, xout
 

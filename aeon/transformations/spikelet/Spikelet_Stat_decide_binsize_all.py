@@ -3,6 +3,7 @@ import time
 import numpy as np
 from aeon.transformations.spikelet.sshist import sshist
 from aeon.transformations.spikelet.histx import histx
+from aeon.transformations.spikelet.histcounts import histcounts
 
 def Spikelet_Stat_decide_binsize_all(D):
     t_start = time.time()
@@ -17,7 +18,7 @@ def Spikelet_Stat_decide_binsize_all(D):
     t_start = time.time()
     Count_fd, edges_mid_fd = histx(D, 'fd')
     time_fd = time.time() - t_start
-    print("**************test richtig? ", len(edges_mid_fd))
+
     t_start = time.time()
     Count_scott, edges_mid_scott = histx(D, 'scott')
     time_scott = time.time() - t_start
@@ -31,7 +32,7 @@ def Spikelet_Stat_decide_binsize_all(D):
     time_middle = time.time() - t_start
 
     t_start = time.time()
-    Count_matlab, edges_matlab = np.histogram(D)
+    Count_matlab, edges_matlab = histcounts(D)
     time_matlab = time.time() - t_start
 
     BinN_list_names = ["shimasaki", "fd", "scott", "sturges", "matlab"]

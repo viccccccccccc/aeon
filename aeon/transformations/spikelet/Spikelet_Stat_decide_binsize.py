@@ -4,6 +4,7 @@ import numpy as np
 
 from aeon.transformations.spikelet.Spikelet_Stat_decide_binsize_all import (Spikelet_Stat_decide_binsize_all)
 from aeon.transformations.spikelet.sshist import sshist
+from aeon.transformations.spikelet.histcounts import histcounts
 
 
 def Spikelet_Stat_decide_binsize(D, Method="auto"):
@@ -18,7 +19,7 @@ def Spikelet_Stat_decide_binsize(D, Method="auto"):
 
     if Method == "shimasaki":
         if np.max(D) != np.min(D):
-            BinN_shimasaki, edges, Count = sshist(D)  # Placeholder for sshist implementation
+            BinN_shimasaki, edges, Count = sshist(D)
             BinN = len(edges)
         else:
             Count, edges = np.histogram(D)
@@ -34,8 +35,6 @@ def Spikelet_Stat_decide_binsize(D, Method="auto"):
 
     elif Method == "auto":
         BinN_list, BinN_list_names, Timelist = Spikelet_Stat_decide_binsize_all(D)
-        print(f"BinN_list: {(BinN_list)}, BinN_list_names: {(BinN_list_names)}, Timelist: {len(Timelist)}")
-        print("")
         BinListInfo["bin"] = BinN_list
         BinListInfo["bin_names"] = BinN_list_names
         BinListInfo["time"] = Timelist
@@ -43,7 +42,7 @@ def Spikelet_Stat_decide_binsize(D, Method="auto"):
         BinN_all_sorted = np.sort(BinN_list)
         BinN = int(np.ceil(np.mean(BinN_all_sorted[1:-1])))
 
-        N, edges = np.histogram(D, bins=BinN)
+        N, edges = histcounts(D, bins=BinN)
 
     elif Method == "min":
         BinN_list, BinN_list_names, Timelist = Spikelet_Stat_decide_binsize_all(D)
