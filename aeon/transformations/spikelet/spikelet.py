@@ -1,6 +1,7 @@
 import numpy as np
 import scipy.io
 import pdb
+import pickle
 
 from aeon.transformations.spikelet.spikelet_approx import Spikelet_aproximation_ver_03
 from aeon.transformations.spikelet.spikelet_char_query import Spikelet_Char_query
@@ -19,18 +20,73 @@ class AlgParam:
         self.query = ["B"]
         self.supp_max = 200
         self.supp_min = 50
-        self.operation_sequence = [
-            "restrictSupportByWindowLength",
-            "reduceSpikeByMagnitude",
-            "restrictSupportByMagnitudeRatioInitial",
-        ]
-        self.magnitude_ratio = 0
-        self.symbol_mapping_rule = [
-            {"condition": "Type == 2 and SuppCBM_100 >= 50", "symbol": "B"},
-            {"condition": "Type == 2 and SuppCBM_100 < 50", "symbol": "A"},
-        ]
-        self.symbol_mapping_argument = [2, "SuppCBM_100", 50, ["B", "A"]]
+        self.operation = {
+            "operation_sequence": [
+                "restrictSupportByWindowLength",
+                "reduceSpikeByMagnitude",
+                "restrictSupportByMagnitudeRatioInitial"
+            ],
+            "restrictSupportByMagnitudeRatio": {"magnitude_ratio": 0}
+        }
+        self.symbol_mapping = {
+            "rule": [
+                {"condition": "Type == 2 and SuppCBM_100 >= 50", "symbol": "B"},
+                {"condition": "Type == 2 and SuppCBM_100 < 50", "symbol": "A"}
+            ],
+            "argument": [2, "SuppCBM_100", 50, ["B", "A"]]
+        }
 
+def Spikelet_CallMpExec_getParam(AlgParam, EnvParam, ThrParam=None):
+    # Set DataFileName if specified in ThrParam
+    if ThrParam and 'DataFileName' in ThrParam:
+        AlgParam.DataFileName = ThrParam['DataFileName']
+    else:
+        AlgParam.DataFileName = AlgParam.DataName
+
+    # Set magnitude and constant length thresholds if available
+    if ThrParam and 'MaT' in ThrParam:
+        AlgParam.magnitude_threshold = ThrParam['MaT']
+    if ThrParam and 'CoT' in ThrParam:
+        AlgParam.constant_length_threshold = ThrParam['CoT']
+
+    # Set environment parameters based on the option in ThrParam
+    Option = ThrParam.get('exec', 'execonly') if ThrParam else 'execonly'
+    EnvParam = CallMpExec_getEnvParam(AlgParam, EnvParam, Option)
+
+    # Set MagInfo_File if specified
+    if ThrParam and 'MagInfo_File' in ThrParam:
+        EnvParam.MagInfo_File = ThrParam['MagInfo_File']
+
+    # Handle MpPlot fields if specified
+    if ThrParam and 'MpPlot' in ThrParam:
+        for fn_i in ThrParam['MpPlot']:
+            EnvParam.MpPlot[fn_i] = ThrParam['MpPlot'][fn_i]
+
+    return AlgParam, EnvParam
+
+def CallMpExec_getEnvParam(AlgParam, EnvParam, Option=None):
+    if Option == 'all':
+        EnvParam = get_EnvParam_all(AlgParam, EnvParam)
+    elif Option == 'plotonly':
+        EnvParam = get_EnvParam_plotonly(AlgParam, EnvParam)
+    elif Option == 'test':
+        EnvParam = get_EnvParam_test(AlgParam, EnvParam)
+    elif Option == 'execonly':
+        EnvParam = get_EnvParam_execonly(AlgParam, EnvParam)
+    elif Option == 'testonly':
+        EnvParam = get_EnvParam_testonly(AlgParam, EnvParam)
+    else:
+        EnvParam = get_EnvParam_plotonly(AlgParam, EnvParam)
+    return EnvParam
+
+def get_EnvParam_all(AlgParam, EnvParam):
+    # Setting full environment parameters
+    EnvParam.Data_Dir = f"{EnvParam.Base_Dir}/data"
+    EnvParam.SpreadSheet_Dir = f"{EnvParam.Base_Dir}/output/{AlgParam.DataName}"
+    EnvParam.MagInfoOutput_ON = True
+    EnvParam.Test_ON = True
+    EnvParam.Plot_ON = True
+    return EnvParam
 
 def print_structure(d, indent=0):
     """Recursively prints the structure of a dictionary."""
@@ -67,11 +123,14 @@ def Spikelet_exec(D, AlgParam, EnvParam):
         Plot_ON = False
 
     Param = Spikelet_MpParam_generate_ver_02(AlgParam)
-    for x in Param["operation"]["operation_sequence"]:
-        print("vals: ", x)
-    print_structure(Param)
-    print("-------------------------------------------")
     MagInfo = Spikelet_aproximation_ver_03(D, Param)
+
+    return MagInfo
+
+    file_path = r'C:\Users\Victor\Desktop\Uni\Bachelor\stuff\MagInfo_post_approx.pkl'
+    with open(file_path, 'wb') as f:
+        pickle.dump(MagInfo, f)
+    print(f"Dictionary erfolgreich unter {file_path} gespeichert.")
 
     # Optional: Keep if you need to print or log symbols
     MagInfo["dataname"] = DataFileName
@@ -153,7 +212,6 @@ def motif_discovery_and_clasp(X):
     alg_param = AlgParam()
 
     # Execute Spikelet algorithm
-    pdb.set_trace()
     MagInfo, TestRslt, Param = Spikelet_exec(X, alg_param, env_param)
 
     # Transformed data after Spikelet (placeholder for actual transformed data)

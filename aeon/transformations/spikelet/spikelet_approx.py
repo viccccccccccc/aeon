@@ -1,4 +1,6 @@
 import time
+import pdb
+import pickle
 
 import numpy as np
 
@@ -46,8 +48,6 @@ def Spikelet_aproximation_ver_03(X, Param):
         ~np.isnan(MagInfo["output"][InitialOpName]["type"])
     )
     MagInfo["param"] = Param
-
-    print(f"{InitialOpName}: time = {MagInfo['time'][InitialOpName]}, size = {MagInfo['size'][InitialOpName]}")
 
     OLD_ON = False
 

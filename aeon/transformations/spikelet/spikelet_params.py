@@ -21,6 +21,13 @@ def Spikelet_MpParam_generate_ver_02(user):
         for field in user.symbol_mapping:
             param["spikeDb"]["symbol_mapping"][field] = user.symbol_mapping[field]
 
+    param["operation"]["extractConstantSegment"]["auto"]["knee_find"]["sign"] = "nonzero"
+
+    param["operation"]["restrictSupportByWindowLength"] = {"window_band": [supp_max, supp_max]}
+
+    if hasattr(user, "symbol_mapping_argument"):
+        param["spikeDb"]["symbol_mapping"]["argument"] = user.symbol_mapping_argument
+
     # Query setup
     if hasattr(user, "query"):
         q_cell = user.query

@@ -20,7 +20,7 @@ X, true_period_size, cps = load_psyllid_segmentation()
 
 from aeon.transformations.spikelet.spikelet import motif_discovery_and_clasp
 
-X = motif_discovery_and_clasp(X)
+#X = motif_discovery_and_clasp(X)
 
 dominant_period_size = find_dominant_window_sizes(X)
 clasp = ClaSPSegmenter(dominant_period_size, n_cps=1)
