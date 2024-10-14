@@ -205,16 +205,14 @@ def Spikelet_MP_plot_all(MagInfo, EnvParam):
 
 # Main function to perform motif discovery
 def motif_discovery_and_clasp(X):
-    print("------------------WE BACK IN THIS BIHHH-----------------")
-
     # Initialize parameters
     env_param = {}
     alg_param = AlgParam()
 
     # Execute Spikelet algorithm
-    MagInfo, TestRslt, Param = Spikelet_exec(X, alg_param, env_param)
+    MagInfo = Spikelet_exec(X, alg_param, env_param)
 
     # Transformed data after Spikelet (placeholder for actual transformed data)
-    transformed_data = MagInfo["data_org"]  # This should be the actual transformed data
+    transformed_data = MagInfo["data"]  # This should be the actual transformed data
 
     return transformed_data

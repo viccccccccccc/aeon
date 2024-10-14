@@ -20,8 +20,6 @@ from aeon.transformations.spikelet.spikelet_Op_call_approximation import (
 
 
 def Spikelet_aproximation_ver_03(X, Param):
-    print("-------------------------spikelet_approx BEGIN------------------------")
-
     # Debug flags
     FigOn_seg = False
     FigOn_leg = False
@@ -103,5 +101,4 @@ def Spikelet_aproximation_ver_03(X, Param):
         MagInfo["size"]["operation_all"] = MagInfo["size"][Ops[-1]]
 
     end_SAt = time.time()
-    print("-------------------------spikelet_approx END------------------------")
     return MagInfo

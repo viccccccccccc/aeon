@@ -53,13 +53,6 @@ def Spikelet_Op_call_approximation(MagInfo):
     
         elif Op == "restrictSupportByMagnitudeRatioInitial":
             MagInfo = Spikelet_restrictSupportByMagnitudeRatioInitial(MagInfo)
-            file_path = r'C:\Users\Victor\Desktop\Uni\Bachelor\stuff\MagInfoo.npy'
-
-            # Save the array to the specified path
-            np.save(file_path, MagInfo["magnitude"])
-
-            print(f"Array saved to {file_path}")
-            
 
         # 3. Constant segment extraction
         elif Op == "extractConstantSegment":

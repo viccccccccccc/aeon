@@ -1,5 +1,4 @@
 def Spikelet_MpParam_generate_ver_02(user):
-    print("------------------Spikelet_MpParam_generate_ver_02 BEGIN-----------------")
     # Function name for logging
     func_name = "Spikelet_MpParam_generate"
 
@@ -124,7 +123,6 @@ def Spikelet_MpParam_generate_ver_02(user):
             "restrictSupportByWindowLength"
         ]["window_band"] = [user.supp_max, user.supp_max]
 
-    print("------------------Spikelet_MpParam_generate_ver_02 END-----------------")
     return param
 
 

@@ -28,16 +28,16 @@ def Spikelet_Stat_knee_find(MagDist, Func, Weight=None):
     # Spikelet_Stat_data2distribution needs to be defined
     Y, X, BinSize, StepDivLength, BinListInfo = Spikelet_Stat_data2distribution(MagDist, D2D_arg_weight, StepDivLength)
 
-    base_path = r'C:\Users\Victor\Desktop\Uni\Bachelor\stuff'
+    # base_path = r'C:\Users\Victor\Desktop\Uni\Bachelor\stuff'
 
-    if len(MagDist) != 62744:
-        file_path = os.path.join(base_path, f'vorlage_Y.mat')
-    else:
-        file_path = os.path.join(base_path, f'vorlage_Y2.mat')
+    # if len(MagDist) != 62744:
+    #     file_path = os.path.join(base_path, f'vorlage_Y.mat')
+    # else:
+    #     file_path = os.path.join(base_path, f'vorlage_Y2.mat')
     
-    mat_data = scipy.io.loadmat(file_path)
-    Y = mat_data["Y"].squeeze()
-    print(f"----------------------Array 'Y' successfully loaded in Spikelet_Stat_knee_find----------------------")
+    # mat_data = scipy.io.loadmat(file_path)
+    # Y = mat_data["Y"].squeeze()
+    # print(f"----------------------Array 'Y' successfully loaded in Spikelet_Stat_knee_find----------------------")
 
     # islocalmin
     if Func_fwd == "islocalmin":
