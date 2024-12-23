@@ -16,7 +16,7 @@ def sshist(x, N=None):
         buf = np.abs(np.diff(np.sort(x)))
         dx = np.min(buf[buf != 0])
         N_MIN = 2  # Minimum number of bins (integer)
-        N_MAX = min(int(np.floor((x_max - x_min) / (2 * dx))), 50)
+        N_MAX = max(N_MIN, min(int(np.floor((x_max - x_min) / (2 * dx))), 50))
         N = np.arange(N_MIN, N_MAX + 1)
 
     SN = 30  # Number of partitioning positions for shift average

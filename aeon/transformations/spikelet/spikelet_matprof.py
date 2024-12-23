@@ -8,10 +8,6 @@ from scipy.spatial.distance import euclidean
 
 
 def Spikelet_MP_new_ver_02(MagInfo, MP_param):
-    
-    print("hier nanhaltten")
-    pdb.set_trace()
-    print("fuck")
     func_name = "Spikelet_MP_new_ver_02"
 
     # Plotting flag

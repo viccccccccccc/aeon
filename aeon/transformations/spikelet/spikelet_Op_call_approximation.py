@@ -11,6 +11,10 @@ from aeon.transformations.spikelet.Spikelet_restrictSupportByMagnitudeRatioIniti
 from aeon.transformations.spikelet.Spikelet_MagInfo_post_processing import Spikelet_MagInfo_post_processing
 from aeon.transformations.spikelet.Spikelet_restrictSupportByWindowLength import Spikelet_restrictSupportByWindowLength
 from aeon.transformations.spikelet.Spikelet_restrictSupportByMagnitudeRatio import Spikelet_restrictSupportByMagnitudeRatio
+from aeon.transformations.spikelet.Spikelet_Op_extractConstantSegment_ver02 import Spikelet_Op_extractConstantSegment_ver02
+from aeon.transformations.spikelet.Spikelet_Stat_extractConstantSegmentInitial import Spikelet_Stat_extractConstantSegmentInitial
+from aeon.transformations.spikelet.Spikelet_Stat_decideCLhrFromSegmentInitial import Spikelet_Stat_decideCLhrFromSegmentInitial
+from aeon.transformations.spikelet.Spikelet_Stat_decideConstantSegment import Spikelet_Stat_decideConstantSegment
 
 def print_structure(d, indent=0):
     """Recursively prints the structure of a dictionary."""
@@ -56,11 +60,9 @@ def Spikelet_Op_call_approximation(MagInfo):
 
         # 3. Constant segment extraction
         elif Op == "extractConstantSegment":
-            # MagInfo = Spikelet_Op_extractConstantSegment(MagInfo)  # correct version
             MagInfo = Spikelet_Op_extractConstantSegment_ver02(MagInfo)  # test version
             CLThr = MagInfo["output"][Op]["length_threshold"]
-            print(f"{Op}: Constant Length Threshold = {CLThr}")
-
+            print(f"Constant Length Threshold = {CLThr}")
         else:
             print(f"unknown operation ({Op})")
 

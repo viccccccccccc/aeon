@@ -97,5 +97,7 @@ def Spikelet_Stat_magnitude_threshold_SuppMax_SuppMRatio(MagInfo, ParamMagThr):
     else:
         print(f"[{Func}] type ({Type}) is not implemented")
         return None, None, MagInfo, KneeInfo
+    
+    print("Magnitude Threshold = ", MagThr)
 
     return MagThr, Mag_selected, MagInfo, KneeInfo

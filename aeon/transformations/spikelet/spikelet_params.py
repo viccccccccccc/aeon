@@ -60,12 +60,19 @@ def Spikelet_MpParam_generate_ver_02(user):
     ]
 
     if hasattr(user, "query"):
-        if contains_in_cell(user.query, "C"):
-            param["operation"]["operation_sequence"] = op_c
-            param["operation"]["name"] = "standard_C"
-        else:
-            param["operation"]["operation_sequence"] = op_nc
-            param["operation"]["name"] = "standard_NC"
+        param["operation"]["operation_sequence"] = [
+            "restrictSupportByWindowLength",
+            "reduceSpikeByMagnitude",
+            "restrictSupportByMagnitudeRatioInitial",
+            "extractConstantSegment",
+        ]
+        param["operation"]["name"] = "custom_sequence"
+        # if contains_in_cell(user.query, "C"):
+        #     param["operation"]["operation_sequence"] = op_c
+        #     param["operation"]["name"] = "standard_C"
+        # else:
+        #     param["operation"]["operation_sequence"] = op_nc
+        #     param["operation"]["name"] = "standard_NC"
 
     field_1, field_2 = "operation", "operation_sequence"
     if hasattr(user, field_1) and field_2 in getattr(user, field_1):
@@ -110,7 +117,6 @@ def Spikelet_MpParam_generate_ver_02(user):
             "method": "manual",
             "manual": {"CLThr": cl_thr},
         }
-
         print(f"[{func_name}] Constant Length threshold ({cl_thr}) is defined by user")
     else:
         param["operation"]["extractConstantSegment"]["lengthThreshold"] = {
@@ -249,136 +255,3 @@ def Spikelet_SD_createTrendPlotParam(op_seq):
 
     return {"trend_timeseries": tt, "trend_magnitude": tm, "trend_decomposition": td}
 
-
-"""
-Output wenn ich in MatLab den Struct Param mir printen lasse:
-
-matrix_profile:
-  distance: char
-name: char
-dataname: char
-operation:
-  operation_sequence: [cell array with 3 elements]
-  name: char
-  reduceSpikeByMagnitude:
-    auto:
-      method: char
-      knee_find:
-        sign: char
-        type: char
-        approx_function: [cell array with 2 elements]
-      op:
-        operation_sequence: [cell array with 2 elements]
-        restrictSupportByMagnitudeRatio:
-          magnitude_ratio: double
-        restrictSupportByWindowLength:
-          window_band: double
-      supp_max: double
-      supp_min: double
-    method: char
-  extractConstantSegment:
-    auto:
-      constant_separated:
-        method: char
-      knee_find:
-        sign: char
-        type: char
-        approx_function: [cell array with 2 elements]
-      supp_max: double
-      supp_min: double
-    legRatio_constant: double
-    legRatio_twoSided: double
-    legRatio_oneSided: double
-    slopeRatio_twoSided: double
-    magRatio_twoSided: double
-    magRatio_oneSided: double
-    lengthThreshold:
-      method: char
-  restrictSupportByMagnitudeRatio:
-    magnitude_ratio: double
-  restrictSupportByMagnitudeRatioInitial:
-    magnitude_ratio: double
-  reduceSpikeByMagnitudeRatio:
-    magnitude_ratio: double
-  restrictSupportByWindowLength:
-    window_band: double
-spikeDb:
-  symbol_mapping:
-    rule: [cell array with 2 elements]
-    supp_max: double
-    supp_min: double
-    argument: [cell array with 4 elements]
-  index: [cell array with 0 elements]
-  reduction_query: char
-query: [cell array with 1 elements]
-plot_param:
-  trend_timeseries: [cell array with 7 elements]
-  trend_magnitude: [cell array with 5 elements]
-  trend_decomposition: [cell array with 5 elements]
-
-In python:
-
-name: <class 'str'>
-dataname: <class 'str'>
-operation:
-  operation_sequence: [<class 'str'>, <class 'str'>, <class 'str'>]
-  name: <class 'str'>
-  reduceSpikeByMagnitude:
-    auto:
-      method: <class 'str'>
-      supp_max: <class 'int'>
-      supp_min: <class 'int'>
-      knee_find:
-        sign: <class 'str'>
-        type: <class 'str'>
-        approx_function: [<class 'str'>, <class 'str'>]
-      op:
-        operation_sequence: [<class 'str'>, <class 'str'>]
-        restrictSupportByMagnitudeRatio:
-          magnitude_ratio: <class 'float'>
-        restrictSupportByWindowLength:
-          window_band: [<class 'int'>, <class 'int'>]
-    method: <class 'str'>
-  extractConstantSegment:
-    auto:
-      constant_separated:
-        method: <class 'str'>
-      knee_find:
-        type: <class 'str'>
-        approx_function: [<class 'str'>, <class 'str'>]
-      supp_max: <class 'int'>
-      supp_min: <class 'int'>
-    legRatio_constant: <class 'float'>
-    legRatio_twoSided: <class 'float'>
-    legRatio_oneSided: <class 'float'>
-    slopeRatio_twoSided: <class 'int'>
-    magRatio_twoSided: <class 'float'>
-    magRatio_oneSided: <class 'int'>
-    lengthThreshold:
-      method: <class 'str'>
-  restrictSupportByMagnitudeRatio:
-    magnitude_ratio: <class 'float'>
-  restrictSupportByMagnitudeRatioInitial:
-    magnitude_ratio: <class 'float'>
-  reduceSpikeByMagnitudeRatio:
-    magnitude_ratio: <class 'float'>
-spikeDb:
-  symbol_mapping:
-    rule: [<class 'dict'>, <class 'dict'>]
-    supp_max: <class 'int'>
-    supp_min: <class 'int'>
-  index: []
-  reduction_query: <class 'str'>
-query: [<class 'dict'>]
-matrix_profile:
-  distance: <class 'str'>
-plot_param:
-  trend_timeseries: [<class 'str'>, <class 'str'>, <class 'str'>, <class 'str'>, <class 'str'>, <class 'str'>, <class 'str'>]
-  trend_magnitude: [<class 'str'>, <class 'str'>, <class 'str'>, <class 'str'>, <class 'str'>]
-  trend_decomposition: [<class 'str'>, <class 'str'>, <class 'str'>, <class 'str'>, <class 'str'>]
-
-  Vermutung warum es noch unterschiede zwischen den Structs gibt:
-  - Einstellung (also input) ist nicht komplett identisch
-  - irgendwo sind noch fehler bei mir lol
-
-"""

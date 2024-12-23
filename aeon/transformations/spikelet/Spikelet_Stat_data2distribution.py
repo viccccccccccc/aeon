@@ -44,7 +44,7 @@ def Spikelet_Stat_data2distribution(D, Arg=None, StepDivLength=10):
 # Bis jetzt habe ich keinen Weg gefunden diese Präzision in Python nachzustellen, dementsprechend ist das Y Array was zurückgegeben
 # wird ganz leicht anders (wir reden von ganz vielen Nachkommastellen). Ich habe erstmal gerundet und weil diese Lösung am besten scheint.
 def spikelet_stat_meanAverage(CLD, EdgeInterval, StepWidth, Weight=np.nan):
-    print("potentielle Baustelle in Spikelet_Stat_data2distribution.py, Funktion: spikelet_stat_meanAverage(). Mehr Informationen in Kommentare.")
+    #print("potentielle Baustelle in Spikelet_Stat_data2distribution.py, Funktion: spikelet_stat_meanAverage(). Mehr Informationen in Kommentare.")
     DEBUG = False
     
     Max = np.max(CLD)

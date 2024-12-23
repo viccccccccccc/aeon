@@ -41,7 +41,6 @@ def Spikelet_generateInitialSpikelet(X, RightWindowLength=np.inf):
     Apl = False
     i = 0
     S = Stack_push(S, 0)
-    indices_to_check = [277838, 277839, 284112, 284113, 291511, 291512, 309116, 309117, 309809, 309810, 309946, 309947, 309997, 309998]
 
     # Main loop
     while not np.isnan(i) and (i <= n - 2 or (i == n - 1 and Apl and S['p'] >= 3)):
@@ -68,7 +67,7 @@ def Spikelet_generateInitialSpikelet(X, RightWindowLength=np.inf):
             # (2.1) Middle leg reduction
             p = S['p']
             s1, s2, s3, s4 = S['v'][p - 4:p]
-
+            s3, s2, s1, s4 = int(s3), int(s2), int(s1), int(s4)  # Cast auf int
             if abs(X[s4] - X[s3]) >= abs(X[s3] - X[s2]) and abs(X[s2] - X[s1]) > abs(X[s3] - X[s2]):
                 S, A, C, L = middle_leg_reduction(X, S, A, C, L, s1, s2, s3, s4)
                 Apl1 = True
@@ -83,6 +82,7 @@ def Spikelet_generateInitialSpikelet(X, RightWindowLength=np.inf):
         if S['p'] >= 3:
             # (2.2) Left leg reduction
             s1, s2, s3 = S['v'][:3]
+            s3, s2, s1 = int(s3), int(s2), int(s1)
             if abs(X[s3] - X[s2]) >= abs(X[s2] - X[s1]):
                 S, A, C, L = left_leg_reduction(X, S, A, C, L, s1, s2, s3)
                 Apl2 = True
@@ -601,6 +601,8 @@ def Spikelet_get_TimeSeriesForm_from_SpikeletDecomposition(MagInfo):
 
     if len(Apx_time) >= 2:
         interpolation_func = interp1d(Apx_time, Data_org.iloc[Apx_time], kind='linear', fill_value="extrapolate")
+        #interpolation_func = interp1d(Apx_time, Data_org[Apx_time], kind='linear', fill_value="extrapolate")
+
         Data = interpolation_func(np.arange(len(Data_org)))
     else:
         Data = Data_org.copy()

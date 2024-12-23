@@ -23,32 +23,11 @@ def Spikelet_Stat_knee_find_2nd_zerocross(MagDist, FuncList, Weight=None):
     t_1_name = "first_knee_opt"
     KneeOpt_1, Info_1, BinListInfo_1 = Spikelet_Stat_knee_find(MagDist, FuncList[0], Weight)
     t_1end = time.time() - t_1
-
-    # file_path = r'C:\Users\Victor\Desktop\Uni\Bachelor\stuff\Info_1.npy'
-
-    # # Save the array to the specified path
-    # np.save(file_path, Info_1)
-
-    # print(f"bwd_model = {Info_1["bwd_model"]}")
-    # print(f"Array saved to {file_path}")
-
-    # #raise SystemExit("Stopping the program with SystemExit.")
-
     t_2 = time.time()
     t_2_name = "second_knee_opt"
     MagDist_2 = MagDist[MagDist >= KneeOpt_1]
     KneeOpt_2, Info_2, BinListInfo_2 = Spikelet_Stat_knee_find(MagDist_2, FuncList[1], Weight)
     t_2end = time.time() - t_2
-
-    # file_path = r'C:\Users\Victor\Desktop\Uni\Bachelor\stuff\Info_2.npy'
-
-    # # Save the array to the specified path
-    # np.save(file_path, Info_2)
-
-    # print(f"bwd_model = {Info_2["bwd_model"]}")
-    # print(f"Array saved to {file_path}")
-    # raise SystemExit("Stopping the program with SystemExit.")
-
     t_3 = time.time()
     t_3_name = "zerocross"
     fwd_model_type_2 = Info_2["bwd_model_type"]

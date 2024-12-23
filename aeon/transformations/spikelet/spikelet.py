@@ -24,7 +24,8 @@ class AlgParam:
             "operation_sequence": [
                 "restrictSupportByWindowLength",
                 "reduceSpikeByMagnitude",
-                "restrictSupportByMagnitudeRatioInitial"
+                "restrictSupportByMagnitudeRatioInitial",
+                "extractConstantSegment"
             ],
             "restrictSupportByMagnitudeRatio": {"magnitude_ratio": 0}
         }
@@ -108,7 +109,8 @@ def Spikelet_exec(D, AlgParam, EnvParam):
         if hasattr(AlgParam, "DataFileName")
         else AlgParam.DataName
     )
-    Thr_Str = ""  # get_Thr_Str(AlgParam) es hat bei dieser methode einen fehler gegeben, methode brauche ich aber gerade eh nicht
+    #Thr_Str = "" #get_Thr_Str(AlgParam) es hat bei dieser methode einen fehler gegeben, methode brauche ich aber gerade eh nicht
+    Thr_Str = get_Thr_Str(AlgParam)
 
     # Optional: Omit the following if no file output is needed
     MagInfo_File = EnvParam.get("MagInfo_File", f"MagInfo_{DataFileName}_{Thr_Str}.mat")
@@ -160,12 +162,14 @@ def Spikelet_exec(D, AlgParam, EnvParam):
     return MagInfo, TestRslt, Param
 
 
-"""def get_Thr_Str(AlgParam):
-    M_Str = f"m{AlgParam['magnitude_threshold']}" if 'magnitude_threshold' in AlgParam else ""
-    C_Str = f"c{AlgParam['constant_length_threshold']}" if 'constant_length_threshold' in AlgParam else ""
+def get_Thr_Str(AlgParam):
+    M_Str = f"m{AlgParam.magnitude_threshold}" if hasattr(AlgParam, 'magnitude_threshold') else ""
+    C_Str = f"c{AlgParam.constant_length_threshold}" if hasattr(AlgParam, 'constant_length_threshold') else ""
     if not M_Str and not C_Str:
+        print("auto was chosen")
         return "auto"
-    return f"{M_Str}_{C_Str}".replace('.', 'p')"""
+    return f"{M_Str}_{C_Str}".replace('.', 'p')
+
 
 
 def print_char_symbol(MagInfo):
@@ -202,17 +206,16 @@ def print_word_symbol(MagInfo):
 def Spikelet_MP_plot_all(MagInfo, EnvParam):
     pass
 
-
-# Main function to perform motif discovery
 def motif_discovery_and_clasp(X):
-    # Initialize parameters
     env_param = {}
     alg_param = AlgParam()
 
-    # Execute Spikelet algorithm
+    # Set values for MaT and CoT
+    #alg_param.magnitude_threshold = 0.5  # Example value for MaT
+    #alg_param.constant_length_threshold = 25  # Example value for CoT
+
     MagInfo = Spikelet_exec(X, alg_param, env_param)
 
-    # Transformed data after Spikelet (placeholder for actual transformed data)
-    transformed_data = MagInfo["data"]  # This should be the actual transformed data
+    transformed_data = MagInfo["data"]
 
     return transformed_data
