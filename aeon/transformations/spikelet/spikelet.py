@@ -166,7 +166,6 @@ def get_Thr_Str(AlgParam):
     M_Str = f"m{AlgParam.magnitude_threshold}" if hasattr(AlgParam, 'magnitude_threshold') else ""
     C_Str = f"c{AlgParam.constant_length_threshold}" if hasattr(AlgParam, 'constant_length_threshold') else ""
     if not M_Str and not C_Str:
-        print("auto was chosen")
         return "auto"
     return f"{M_Str}_{C_Str}".replace('.', 'p')
 
