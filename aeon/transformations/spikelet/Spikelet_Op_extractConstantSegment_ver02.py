@@ -92,6 +92,7 @@ def Spikelet_Op_extractConstantSegment_ver02(MagInfo):
     constant_segment_names = [
         "constant_time_from", "constant_time_to", "band_value_mean"
     ]
+    Segment = np.array(Segment)
     ConstantSegment = np.zeros((Segment.shape[0], len(constant_segment_names))) * np.nan
     for i in range(Segment.shape[0]):
         ConstantSegment[i, 0] = Segment[i, Segment_names.index("from")]

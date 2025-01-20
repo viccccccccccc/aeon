@@ -205,16 +205,16 @@ def print_word_symbol(MagInfo):
 def Spikelet_MP_plot_all(MagInfo, EnvParam):
     pass
 
-def motif_discovery_and_clasp(X):
+def motif_discovery_and_clasp(X, mat, cot):
     env_param = {}
     alg_param = AlgParam()
 
     # Set values for MaT and CoT
-    #alg_param.magnitude_threshold = 0.5  # Example value for MaT
-    #alg_param.constant_length_threshold = 25  # Example value for CoT
+    alg_param.magnitude_threshold = mat  # Example value for MaT
+    alg_param.constant_length_threshold = cot  # Example value for CoT
 
     MagInfo = Spikelet_exec(X, alg_param, env_param)
 
     transformed_data = MagInfo["data"]
 
-    return transformed_data
+    return transformed_data 

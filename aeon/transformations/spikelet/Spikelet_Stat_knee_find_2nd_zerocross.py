@@ -36,6 +36,9 @@ def Spikelet_Stat_knee_find_2nd_zerocross(MagDist, FuncList, Weight=None):
     Y_fwd = Info_2["Y_fwd"]
     Opt_fwd = Info_2['opt'][:len(Y_fwd), 1]
     KneeOpt_zerocross_ref, InOut = zerocross_inout_region(Y_fwd, Opt_fwd)
+    if KneeOpt_zerocross_ref >= len(X_fwd):
+        print(f"Warnung: KneeOpt_zerocross_ref ({KneeOpt_zerocross_ref}) ist außerhalb der Grenzen von X_fwd (Größe: {len(X_fwd)}).")
+        KneeOpt_zerocross_ref = len(X_fwd) - 1
     KneeOpt_zerocross = X_fwd[KneeOpt_zerocross_ref]
     t_3end = time.time() - t_3
 
