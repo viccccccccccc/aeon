@@ -145,20 +145,17 @@ def save_evaluation_data_incremental(new_data, output_dir2, ts_name, len_ts, cps
 
     if "memory_consumption" in existing_data:
         for combination_name, memory_values in new_data["memory_consumption"].items():
-            # ✅ Stelle sicher, dass die Basisstruktur existiert
             if combination_name not in existing_data["memory_consumption"]:
                 existing_data["memory_consumption"][combination_name] = {
                     "Spikelet": {"peak": [], "current": []},
                     "ClaSP": {"peak": [], "current": []},
                     "Downsampling": {"peak": [], "current": []}
                 }
-
-            # ✅ Werte aus Spikelet, ClaSP und Downsampling extrahieren
+                
             for component in ["Spikelet", "ClaSP", "Downsampling"]:
                 if component in memory_values:
                     entry = memory_values[component]
                     if isinstance(entry, dict):
-                        # ✅ Werte eintragen, wenn vorhanden
                         if "peak" in entry:
                             existing_data["memory_consumption"][combination_name][component]["peak"].append(entry["peak"])
                         else:
