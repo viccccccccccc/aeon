@@ -490,7 +490,7 @@ if __name__ == "__main__":
     test()
 
 
-############################################### LITERALLY DIE GODRUNS ###############################################
+############################################### RUNS ###############################################
 # Run_20250223_160954 - optimale MaT und CoT werte run mit nth n = 4 auf alle TSSB datensätze
 # Run_20250221_114401 - optimale MaT und CoT werte run mit extrema w_e = 3 auf alle TSSB datensätze -> stimmt nicht
 # Run_20250221_135532, Run_20250223_163211 - optimale MaT und CoT werte run mit extrema2 w_e = 13 auf alle FLOSS datensätze
@@ -507,60 +507,8 @@ if __name__ == "__main__":
 # Run_20250215_215015 - mit MeWS, downsampling vor spikelet alle floss datensätze.
 ### Run_20250215_215015 - Kopie - mit MeWS, downsampling vor spikelet alle floss datensätze.
 
-# Run_20250208_173320 - mit MeWS, spikelet vor downsampling alle floss datensätze. (von gruenau)
-# Run_20250209_070417 - mit MeWS, downsampling vor spikelet alle floss datensätze. (von gruenau)
+# Run_20250208_173320 - mit MeWS, spikelet vor downsampling alle floss datensätze.
+# Run_20250209_070417 - mit MeWS, downsampling vor spikelet alle floss datensätze.
 
 # Run_20250216_112902 - testrun, nur extrema 8-12 um zu gucken wie sich das verhält
 
-############################################ RUNS MIT SPIKELET VOR DOWNSAMPLING ############################################
-
-# Run_20250115_181427 - nth ist 3 und extrema window size ist vollständig w
-# Run_20250116_151615 - nth ist 4 und extrema window size ist halbiert
-# Run_20250116_160330 - nth ist 5 und extrema window size ist gedrittelt
-# Run_20250116_164144 - nth ist 2 und extrema window size ist * 1.5
-# Run_20250116_172003 - nth ist 2 und extrema window size ist halbiert
-# Run_20250116_184821 - nth ist 2 und extrema window size ist * 0.75
-# Run_20250116_191717 - nth ist 2 und extrema window size ist * 1.25
-# Run_20250117_131016 - nth ist 2/3 und extrema window size ist * 0.4
-# Run_20250117_155533 - nth ist 2/3 und extrema window size ist * 0.35
-# Run_20250118_125509 - nth ist 4/5 und extrema wurde neue technik ausprobiert: aber window size ist * 0.3
-# Run_20250118_135339 - nth ist 4 und extrema wurde neue technik ausprobiert: aber window size ist * 0.4 - neue technik ist lowkey ass
-# Run_20250118_155836 - nth ist 4 und extrema window size ist * 0.45
-# Run_20250122_161750 - nth ist 7 und extrema window size ist 10.
-# Run_20250122_164809 - nth ist 9 und extrema window size ist 5.
-# Run_20250122_173909 - nth ist 11 und extrema window size ist 4
-# Run_20250122_183605 - nth ist 15 und extrema window size ist 3
-# Run_20250122_192106 - nth ist 10 und extrema window size ist 3 (mean() wurde rausgenommen also wurde die downsampled_ts um 2 immer verlängert)
-# Run_20250123_113006 - nth ist 12 und extrema window size ist 4 (mean() wurde rausgenommen also wurde die downsampled_ts um 2 immer verlängert)
-# Run_20250123_130840 - nth ist 13 und extrema window size ist 3 (mean() wurde rausgenommen also wurde die downsampled_ts um 2 immer verlängert)
-# Run_20250123_133848 - nth ist 8 und extrema window size ist 3 (mean() wurde rausgenommen also wurde die downsampled_ts um 2 immer verlängert)
-# Run_20250126_194106 - nth ist 4 und extrema window size ist 3 (mean() wurde rausgenommen also wurde die downsampled_ts um 2 immer verlängert)
-# Run_20250126_203727 - nth ist 5 und extrema window size ist 3 (mean() wurde rausgenommen also wurde die downsampled_ts um 2 immer verlängert)
-
-
-############################################ RUNS MIT SPIKELET NACH DOWNSAMPLING ############################################
-
-# Run_20250122_123617 - nth ist 4 und extrema window size ist * 0.45. 
-# Run_20250122_132500 - nth ist 2 und extrema window size ist * 0.35. 
-# Run_20250122_140120 - nth ist 3 und extrema window size ist * 0.5. 
-# Run_20250122_144047 - nth ist 5 und extrema window size ist * 0.75. 
-# Run_20250122_154708 - nth ist 7 und extrema window size ist 10. 
-# Run_20250127_140105 - nth ist 8 und extrema window size ist 3 (mean() wurde rausgenommen also wurde die downsampled_ts um 2 immer verlängert)
-# Run_20250127_143407 - nth ist 10 und extrema window size ist 4 (mean() wurde rausgenommen also wurde die downsampled_ts um 2 immer verlängert)
-# Run_20250127_151224 - nth ist 12 und extrema window size ist 4
-# Run_20250127_155430 - nth ist 15 und extrema window size ist 5
-# Run_20250127_163423 - nth ist 6 und extrema window size ist 3 (mean() wurde rausgenommen also wurde die downsampled_ts um 2 immer verlängert)
-# Run_20250127_170929 - nth ist 11 und extrema window size ist 4 (mean() wurde rausgenommen also wurde die downsampled_ts um 2 immer verlängert)
-# Run_20250127_214814 - nth ist 4 und extrema window size ist 3 (mean() wurde rausgenommen also wurde die downsampled_ts um 2 immer verlängert) - ts_down + spikelet_ts wurde gespeichert
-# Run_20250127_224039 - nth ist 5 und extrema window size ist 4 (mean() wurde rausgenommen also wurde die downsampled_ts um 2 immer verlängert) - ts_down + spikelet_ts wurde gespeichert
-# Run_20250127_232640 - nth ist 8 und extrema window size ist 4 - ts_down + spikelet_ts wurde gespeichert
-# Run_20250128_001655 - nth ist 10 und extrema window size ist 5 - ts_down + spikelet_ts wurde gespeichert
-
-
-
-############################################ RUNS MIT ITERIERENDE MAT ############################################
-
-# Run_20250123_172440 - tiefgründiger Spikelet run auf "Crop"
-# Run_20250126_110710 - tiefgründiger Spikelet run auf "NonInvasiveFetalECGThorax1"
-# Run_20250126_154020 - tiefgründiger Spikelet run auf "FaceFour"
-# FacesUCR hat verbesserungen gezeigt aber ist abgestürzt
