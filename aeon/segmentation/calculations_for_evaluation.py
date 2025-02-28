@@ -26,36 +26,55 @@ def calc_and_print_avg_scores(data):
     else:
         print("Scores is not in the dictionary")
 
+def calc_and_print_median_scores(data):
+    """
+    Berechnet und gibt die Medianscores für jede Kombination in 'scores' aus.
+    
+    Parameters:
+    - data (dict): Ein Dictionary, das eine "scores"-Liste mit Werten enthält.
+    """
+    if "scores" in data:
+        for comb in data["scores"]:
+            median = np.median(data["scores"][comb])  # Berechnet den Median der Scores
+            print(f"Score median von {comb}: {median}")
+    else:
+        print("Scores is not in the dictionary")
+
 def calc_and_print_avg_time_diff(data):
     for comb in data:
         averages = calc_average(data[comb])
         print(f"Time average von {comb}: {averages}")
 
 def calc_and_print_avg_times(data):
+    """
+    Berechnet die Gesamtausführungszeit (Summe von Spikelet, ClaSP, Downsampling)
+    für jede Kombination und gibt den Durchschnitt aus.
+    
+    Parameters:
+    - data (dict): Ein Dictionary mit "execution_times"
+    """
     if "execution_times" in data:
-            for comb in data["execution_times"]:
-                spikelet_sum = 0
-                clasp_sum = 0
-                downsampling_sum = 0
+        for comb in data["execution_times"]:
+            total_sum = 0.0
+            execution_list = data["execution_times"][comb]
 
-                execution_list = data["execution_times"][comb]
-
-                for entry in execution_list:
-                    spikelet_sum += entry.get("Spikelet", 0)
-                    clasp_sum += entry.get("ClaSP", 0)
-                    downsampling_sum += entry.get("Downsampling", 0)
-
-                num_entries = len(execution_list)
-                spikelet_avg = spikelet_sum / num_entries if num_entries > 0 else 0
-                clasp_avg = clasp_sum / num_entries if num_entries > 0 else 0
-                downsampling_avg = downsampling_sum / num_entries if num_entries > 0 else 0
+            # Summe aller Zeiten (Spikelet, ClaSP, Downsampling)
+            for entry in execution_list:
+                if isinstance(entry, dict):
+                    spikelet_time = entry.get("Spikelet", 0)
+                    clasp_time = entry.get("ClaSP", 0)
+                    downsampling_time = entry.get("Downsampling", 0)
+                    total_sum += spikelet_time + clasp_time + downsampling_time
                 
-                print(f"Time averages for {comb}:")
-                print(f"  Spikelet: {spikelet_avg}")
-                print(f"  ClaSP: {clasp_avg}")
-                print(f"  Downsampling: {downsampling_avg}")
+            num_entries = len(execution_list)
+
+            # Durchschnitt aus der Gesamtsumme
+            total_avg = total_sum / num_entries if num_entries > 0 else 0
+            
+            print(f"Time average for {comb}: {total_avg:.6f}")
     else:
-        print("execution times are not in the dictionary")
+        print("execution_times are not in the dictionary")
+
 
 def f1_score(data):
     results = {}
@@ -115,11 +134,29 @@ def sum_execution_times_per_dataset(execution_times):
     for combination in execution_times:
         result[combination] = []
         for entry in execution_times[combination]:
-            values = entry.values()
-            total = sum(values)
-            result[combination].append(total)
-         
+            total_for_entry = sum(entry.values())
+            result[combination] = total_for_entry
+
     return result
+
+def sum_execution_times_per_dataset2(execution_times):
+    """
+    Sums up execution times for each key within a dataset.
+    
+    Parameters:
+    - execution_times (dict): A dictionary where keys are dataset descriptions 
+      and values are lists of execution time components.
+    
+    Returns:
+    - dict: A dictionary with summed execution times per dataset.
+    """
+    summed_times = []
+    
+    for dicts in execution_times:
+        total_time = sum(dicts.values())
+        summed_times.append(total_time)
+    
+    return summed_times
 
 def calculate_percentage_difference_clasp_vs_variants(data):
     """
@@ -177,4 +214,30 @@ def calc_median(values):
         mid2 = values[n // 2]
         return (mid1 + mid2) / 2
 
+def calc_and_print_std_deviation(times, lengths):
+    normalized_runtimes = [rt / l for rt, l in zip(times, lengths)]
+    std_dev_normalized = np.std(normalized_runtimes)
+    print("standard deviation: ", std_dev_normalized)
+    return std_dev_normalized
+
+def konfidenzintervall(mean, stddev_abs):
+    z = 1.64  # 1.96 für 95% Konfidenzintervall, 1.64 für 10% Konfidenzintervall
+    ci_lower = mean - z * stddev_abs
+    ci_upper = mean + z * stddev_abs
+    print("Konfidenzintervall:", (ci_lower, ci_upper))
+
+def mse_ts(ts1, ts2):
+    ts1 = np.array(ts1)
+    ts2 = np.array(ts2)
+    return np.mean((ts1-ts2)**2)
+
+def calc_mse(data1, data2):
+    nth_mse = 0
+    extrema_mse = 0
+    for ts_name in data1:
+        print("downsampled len: ", len(data1[ts_name]["nth"]["downsampled_ts"]))
+        print("downsampled spikelet len: ", len(data2[ts_name]["nth"]["spikelet_downsampled_ts"]))
+        nth_mse += mse_ts(data1[ts_name]["nth"]["downsampled_ts"], data2[ts_name]["nth"]["spikelet_downsampled_ts"])
+        extrema_mse += mse_ts(data1[ts_name]["Extrema"]["downsampled_ts"], data2[ts_name]["Extrema"]["spikelet_downsampled_ts"])
+    return nth_mse/len(data1), extrema_mse/len(data1)
 

@@ -2,6 +2,8 @@ import numpy as np
 import scipy.io
 import pdb
 import pickle
+import json
+from pathlib import Path
 
 from aeon.transformations.spikelet.spikelet_approx import Spikelet_aproximation_ver_03
 from aeon.transformations.spikelet.spikelet_char_query import Spikelet_Char_query
@@ -205,13 +207,41 @@ def print_word_symbol(MagInfo):
 def Spikelet_MP_plot_all(MagInfo, EnvParam):
     pass
 
-def motif_discovery_and_clasp(X, mat, cot):
+def extract_parameters(ts_name, json_paths):
+    for json_path in json_paths:
+        file_path = Path(json_path)
+        if not file_path.exists():
+            continue
+        
+        with open(file_path, 'r', encoding='utf-8') as file:
+            data = json.load(file)
+        
+        if ts_name in data.get("ts_names", []):
+            index = data["ts_names"].index(ts_name)
+            parameter_string = data["parameters"][index]
+            mat, cot = map(float, [param.split("=")[1] for param in parameter_string.split(", ")])
+            return mat, cot
+    
+    return None, None
+
+def motif_discovery_and_clasp(X, mat, cot, ts_name, analysis_mode):
     env_param = {}
     alg_param = AlgParam()
 
+    if analysis_mode:
+        json_paths = [
+            "C:\\Users\\Victor\\Desktop\\Uni\\Bachelor\\optimal_output\\tssb\\top_scores.json",
+            "C:\\Users\\Victor\\Desktop\\Uni\\Bachelor\\optimal_output\\floss\\top_scores.json"
+        ]
+        
+        extracted_mat, extracted_cot = extract_parameters(ts_name, json_paths)
+        if extracted_mat is not None and extracted_cot is not None:
+            mat, cot = extracted_mat, extracted_cot
+
     # Set values for MaT and CoT
-    alg_param.magnitude_threshold = mat  # Example value for MaT
-    alg_param.constant_length_threshold = cot  # Example value for CoT
+    if mat != None and cot != None:
+        alg_param.magnitude_threshold = mat  # Example value for MaT
+        alg_param.constant_length_threshold = int(cot)  # Example value for CoT
 
     MagInfo = Spikelet_exec(X, alg_param, env_param)
 

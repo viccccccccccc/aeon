@@ -1,8 +1,11 @@
 import matplotlib.pyplot as plt
 import numpy as np
 from scipy.stats import norm
+from scipy.io import savemat
 import scipy.io
 import os
+import json
+import pdb
 
 from aeon.transformations.spikelet.Spikelet_Stat_data2distribution import (
     Spikelet_Stat_data2distribution,
@@ -27,17 +30,6 @@ def Spikelet_Stat_knee_find(MagDist, Func, Weight=None):
 
     # Spikelet_Stat_data2distribution needs to be defined
     Y, X, BinSize, StepDivLength, BinListInfo = Spikelet_Stat_data2distribution(MagDist, D2D_arg_weight, StepDivLength)
-
-    # base_path = r'C:\Users\Victor\Desktop\Uni\Bachelor\stuff'
-
-    # if len(MagDist) != 62744:
-    #     file_path = os.path.join(base_path, f'vorlage_Y.mat')
-    # else:
-    #     file_path = os.path.join(base_path, f'vorlage_Y2.mat')
-    
-    # mat_data = scipy.io.loadmat(file_path)
-    # Y = mat_data["Y"].squeeze()
-    # print(f"----------------------Array 'Y' successfully loaded in Spikelet_Stat_knee_find----------------------")
 
     # islocalmin
     if Func_fwd == "islocalmin":
@@ -75,6 +67,9 @@ def Spikelet_Stat_knee_find(MagDist, Func, Weight=None):
 
     Knee_list = X_sorted[Dim_fwd:-(1 + Dim_bwd)]
 
+    if len(Knee_list) == 0:
+        Knee_list = np.array([])
+
     Err = np.inf * np.ones_like(Knee_list)
 
     for i in range(len(Knee_list)):
@@ -97,9 +92,21 @@ def Spikelet_Stat_knee_find(MagDist, Func, Weight=None):
         elif ErrFunc == "l2":
             Err[i] = np.sum((YE - Y) ** 2)
 
-    opt_error = np.min(Err)
-    opt_pos = np.argmin(Err)
-    KneeOpt = Knee_list[opt_pos]
+    # opt_error = np.min(Err)
+    # opt_pos = np.argmin(Err)
+    # KneeOpt = Knee_list[opt_pos]
+
+    # Überprüfen, ob Err leer ist
+    if Err.size == 0:
+        opt_error = np.array([])  # Standardwert für Fehler, wenn Err leer ist
+        opt_pos = np.array([])  # Standardposition (erste Position, falls erforderlich)
+        KneeOpt = np.array([])  # Fallback: erster Wert in X_sorted
+    else:
+        # Normale Berechnung, wenn Err nicht leer ist
+        opt_error = np.min(Err)
+        opt_pos = np.argmin(Err)
+        KneeOpt = Knee_list[opt_pos]
+
 
     # Correction for third poly
     if Func_fwd == "poly" and Dim_fwd == 3:
@@ -127,14 +134,35 @@ def Spikelet_Stat_knee_find(MagDist, Func, Weight=None):
             KneeOpt = Knee_list[opt_pos]
 
     # Output
-    Fwd_index = X <= KneeOpt
-    MD_index = MagDist <= KneeOpt
-    X_fwd, Y_fwd = X[Fwd_index], Y[Fwd_index]
-    X_bwd, Y_bwd = X[~Fwd_index], Y[~Fwd_index]
-    MD_fwd, MD_bwd = MagDist[MD_index], MagDist[~MD_index]
-    YE_fwd, P_fwd = apploximate_XY_or_MD(X_fwd, Y_fwd, MD_fwd, Func_fwd, Dim_fwd)
-    YE_bwd, P_bwd = apploximate_XY_or_MD(X_bwd, Y_bwd, MD_bwd, Func_bwd, Dim_bwd)
-    YE_opt = np.concatenate([YE_fwd, YE_bwd])
+    # Fwd_index = X <= KneeOpt
+    # MD_index = MagDist <= KneeOpt
+    if KneeOpt.size == 0:
+        # Leere Bool-Maske wie 1x0 logical in MATLAB
+        Fwd_index = np.array([False]) #np.zeros(0)
+        MD_index = np.array([False]) #np.zeros(0)
+        X_fwd, Y_fwd = np.array([]), np.array([])
+        X_bwd, Y_bwd = np.array([]), np.array([])
+        MD_fwd, MD_bwd = np.array([]), np.array([])
+        YE_fwd, P_fwd = apploximate_XY_or_MD(X_fwd, Y_fwd, MD_fwd, Func_fwd, Dim_fwd)
+        YE_bwd, P_bwd = apploximate_XY_or_MD(X_bwd, Y_bwd, MD_bwd, Func_bwd, Dim_bwd)
+        YE_opt = np.concatenate([YE_fwd, YE_bwd])
+    else:
+        Fwd_index = (X <= KneeOpt)
+        MD_index = MagDist <= KneeOpt
+        X_fwd, Y_fwd = X[Fwd_index], Y[Fwd_index]
+        X_bwd, Y_bwd = X[~Fwd_index], Y[~Fwd_index]
+        MD_fwd, MD_bwd = MagDist[MD_index], MagDist[~MD_index]
+        YE_fwd, P_fwd = apploximate_XY_or_MD(X_fwd, Y_fwd, MD_fwd, Func_fwd, Dim_fwd)
+        YE_bwd, P_bwd = apploximate_XY_or_MD(X_bwd, Y_bwd, MD_bwd, Func_bwd, Dim_bwd)
+        YE_opt = np.concatenate([YE_fwd, YE_bwd])
+
+
+    if YE_opt is None or len(YE_opt) == 0:
+    # Falls YE_opt leer ist, nur den ersten Wert von X nehmen und bspw. 0 oder np.nan als Y
+        opt_array = np.column_stack((X[:1], [0.0]))  
+    else:
+        # Normale Fall: X und YE_opt haben gleiche Länge
+        opt_array = np.column_stack((X, YE_opt))
 
     Info = {
         "X_fwd": X_fwd,
@@ -154,7 +182,7 @@ def Spikelet_Stat_knee_find(MagDist, Func, Weight=None):
         "bin_size": BinSize,
         "step_div_length": StepDivLength,
         "raw_smoothed": np.column_stack((X, Y)),
-        "opt": np.column_stack((X, YE_opt)),
+        "opt": opt_array,
     }
 
     if DEBUG:
@@ -222,8 +250,13 @@ def extract_fb_function(Func):
 
 def apploximate_XY_or_MD(X, Y, MD, Func, Dim):
     if Func == "poly":
-        P = np.polyfit(X, Y, Dim)
-        YE = np.polyval(P, X)
+        if X.size < 2 or Y.size < 2:
+            # Standardpolynom mit Null-Werten, falls nicht genug Punkte vorhanden sind
+            P = np.zeros(Dim + 1)  # Polynom-Koeffizienten alle auf 0 setzen
+            YE = np.zeros_like(X)  # Approximierte Werte ebenfalls 0
+        else:
+            P = np.polyfit(X, Y, Dim)  # Polynom berechnen
+            YE = np.polyval(P, X)      # Werte des Polynoms berechnen
     elif Func == "normal":
         if len(MD) > 3:
             P = norm.fit(MD)
@@ -270,3 +303,176 @@ def Spikelet_Stat_knee_find_double(MagDist, FuncList, Weight=None):
         plot_kee_find(Info)
 
     return KeeOpt, Info
+
+import numpy as np
+import scipy.linalg as la
+import warnings
+
+def polyfit(x, y, n):
+    """
+    Python-Pendant zu MATLAB polyfit(x, y, n).
+
+    Gibt zurück:
+      p  : array (Länge n+1), Polynomkoeffizienten in absteigender Potenzreihenfolge
+      S  : dict mit Schlüsseln 'R', 'df', 'normr', 'rsquared'
+      mu : array(2), [mean_x, std_x], sofern Zentrierung/Skalierung erfolgt
+    """
+
+    # ------------------------------------------------------------
+    # 1) MATLAB: Größencheck, x und y müssen gleich viele Elemente haben
+    # ------------------------------------------------------------
+    if len(x) != len(y):
+        raise ValueError("MATLAB:polyfit:XYSizeMismatch")
+
+    # In numpy-Arrays wandeln; float-Konvertierung wie in MATLAB (double).
+    x = np.asarray(x, dtype=float)
+    y = np.asarray(y, dtype=float)
+
+    # Ermitteln wir die "Ausgangs-Klasse" (in MATLAB: superiorfloat), hier
+    # lassen wir es i.d.R. bei float64. Für Single-Präzision müsste man extra
+    # Logik einbauen.
+    # outputClass = float   # (Placebo im Vergleich zu MATLAB.)
+
+    # ------------------------------------------------------------
+    # 2) Wenn in MATLAB nargout > 2 => mu = [mean(x); std(x)] und
+    #    interne Zentrierung und Skalierung von x.
+    #
+    #    Wir machen es hier IMMER, damit p,S,mu kompatibel sind.
+    #    (Du kannst gerne eine Option 'return_mu' einführen, falls gewünscht.)
+    # ------------------------------------------------------------
+    mx = np.mean(x)
+    # MATLABs std() default ist die Stichprobenvarianz (N-1) -> ddof=1
+    sx = np.std(x, ddof=1)
+    mu = np.array([mx, sx])
+
+    if sx != 0.0:
+        x_scaled = (x - mx)/sx
+    else:
+        # Falls alle x identisch sind: std=0 => verhüte Division durch 0
+        x_scaled = x - mx  # alles Null
+        # MATLAB warnt bei "X might need centering and scaling", wir können
+        # analog warnen, wenn du 1:1-Verhalten willst.
+        # Für Einfachheit hier: tun wir so.
+        warnings.warn("MATLAB:polyfit:RepeatedPointsOrRescale", UserWarning)
+
+    # ------------------------------------------------------------
+    # 3) Vandermonde-Matrix V konstruieren (wie in MATLAB: x^n ... x^1, x^0)
+    #
+    # MATLAB tut:
+    #   V(:, n+1) = ones(...)
+    #   for j = n:-1:1
+    #       V(:, j) = x .* V(:, j+1);
+    #   end
+    #
+    # In NumPy gibt es np.vander(x, N+1) => Spalte0 = x^N, ... SpalteN = x^0
+    # Das passt perfekt.
+    # ------------------------------------------------------------
+    V = np.vander(x_scaled, n+1)  # shape = (len(x), n+1)
+
+    # ------------------------------------------------------------
+    # 4) Least-Squares-Lösung p = V \ y
+    #
+    # In MATLAB:
+    #   [p, rankV, QRfactor, perm] = matlab.internal.math.leastSquaresFit(V,y1);
+    #
+    # Dort wird ein QR mit Spalten-Pivoting gemacht. Um das zu matchen:
+    #   Q, R, Piv = qr(V, pivoting=True) in SciPy
+    #
+    # Danach kann man p lösen (ggf. mit R, Q, Piv).
+    # ------------------------------------------------------------
+    Q, R, pvt = la.qr(V, mode='economic', pivoting=True)
+
+    # rank:
+    # Toleranz wie in MATLAB ~ max(size(V))*eps(norm(R,1)) etc.
+    # Hier nehmen wir dasselbe, was la.qr() nutzt oder la.lstsq():
+    tol = np.finfo(V.dtype).eps * np.abs(R).max() * max(V.shape)
+    # Bestimmen wir den (numerischen) Rang:
+    diagR = np.abs(np.diag(R))
+    rankV = np.sum(diagR > tol)
+
+    # y in passender Form:
+    y1 = y.copy()
+
+    # 4a) Löse Q*R*P^T * p = y => R * (P^T p) = Q^T y
+    # => p_hat = P * R^{-1} Q^T y
+    # Zuerst c = Q^T y
+    c = np.dot(Q.T, y1)
+    # Dann R^-1 c, aber nur bis rankV
+    # Falls rankV < n+1 => wir müssen truncated solve machen
+    c[:rankV] = la.solve_triangular(R[:rankV, :rankV], c[:rankV], lower=False)
+    c[rankV:] = 0.0
+    # Dann p_hat = zeros, aber in der permutierten Reihenfolge füllen
+    ptemp = np.zeros(n+1, dtype=float)
+    for i, colindex in enumerate(pvt):
+        ptemp[colindex] = c[i]
+
+    p = ptemp  # -> p in descending powers
+
+    # ------------------------------------------------------------
+    # 5) Warnungen ausgeben
+    # ------------------------------------------------------------
+    # if size(V,1) < size(V,2)
+    if V.shape[0] < V.shape[1]:
+        warnings.warn("MATLAB:polyfit:PolyNotUnique", UserWarning)
+
+    # if rankV < size(V,2)
+    if rankV < V.shape[1]:
+        # in MATLAB: wenn nargout>2 => 'RepeatedPoints', sonst 'RepeatedPointsOrRescale'
+        # Da wir hier immer 'mu' zurückgeben, verhalten wir uns wie nargout>2:
+        warnings.warn("MATLAB:polyfit:RepeatedPoints", UserWarning)
+
+    # ------------------------------------------------------------
+    # 6) S-Struktur aufbauen
+    #
+    # S.R     = R (im entpivotierten Format)
+    # S.df    = max(0, length(y) - (n+1))
+    # S.normr = norm(r)
+    # S.rsquared = ...
+    #
+    # r = y - V*p
+    # ------------------------------------------------------------
+    # Residuen
+    r = y - V.dot(p)
+    normr = np.linalg.norm(r)
+
+    # R entpivotieren => Rvoll = R[:,pvt^-1]
+    # pvt ist z.B. [2,0,1] => invertiere
+    invpvt = np.zeros_like(pvt)
+    for idx, col in enumerate(pvt):
+        invpvt[col] = idx
+    # => Rsort = R[:, invpvt], allerdings nur die ersten minmn Zeilen
+    #   minmn = min(size(V)) = rank(V) max, aber wir extrahieren:
+    minmn = min(*V.shape)
+    R_extract = R[:minmn, :]     # oberer Teil
+    # In MATLAB: R(:,perminv)
+    R_entpivot = R_extract[:, invpvt]
+
+    df = max(0, len(y) - (n+1))
+
+    # R^2
+    # S.rsquared = 1 - (norm(r)/norm(y - mean(y)))^2
+    ym = np.mean(y)
+    norm_ymean = np.linalg.norm(y - ym)
+    if norm_ymean == 0.0:
+        # Verhindert 0-Division, z.B. wenn alle y identisch
+        rsq = 1.0 if normr == 0 else 0.0
+    else:
+        rsq = 1.0 - (normr / norm_ymean)**2
+
+    S = {
+        'R':      R_entpivot,
+        'df':     df,
+        'normr':  normr,
+        'rsquared': rsq
+    }
+
+    # ------------------------------------------------------------
+    # 7) MATLAB: p wird als ZEILENvektor zurückgegeben => p'
+    #
+    # In NumPy ist ein 1D-array sowieso (n+1, ), wir können aber
+    # anmerken, dass es "row vector" sein soll. Meist reicht 1D in Python.
+    # ------------------------------------------------------------
+    # => In MATLAB: p hat shape (1, n+1). In Python normalerweise (n+1, ).
+    # Wir belassen es bei 1D, was das Übliche in Python ist.
+
+    return p, S, mu

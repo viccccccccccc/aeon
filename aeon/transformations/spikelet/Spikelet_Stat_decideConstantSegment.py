@@ -56,6 +56,9 @@ def Spikelet_Stat_decideConstantSegment(data_org, segment_initial, segment_names
     # Step 2: Cut out-band constants
     cld_cl_thr = segment_initial[id_cl_thr_cut, segment_names.index("length")]
     mv_cl_thr = segment_initial[id_cl_thr_cut, segment_names.index("mean_value")]
+
+    if mv_cl_thr.size == 0 or np.isnan(mv_cl_thr).all():
+        return segment_initial[id_cl_thr_cut], segment_names, segment_id_hist
     center_val_weighted = calculate_center_value(mv_cl_thr, cld_cl_thr)
 
     center_band = [center_val_weighted - mag_thr / 2, center_val_weighted + mag_thr / 2]

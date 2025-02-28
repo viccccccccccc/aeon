@@ -1,5 +1,5 @@
 import time
-
+import pdb
 import matplotlib.pyplot as plt
 import numpy as np
 
@@ -34,10 +34,12 @@ def Spikelet_Stat_knee_find_2nd_zerocross(MagDist, FuncList, Weight=None):
     fwd_model_2 = Info_2["fwd_model"]
     X_fwd = Info_2["X_fwd"]
     Y_fwd = Info_2["Y_fwd"]
+    if len(X_fwd) == 0:
+        X_fwd = np.array([0], dtype=float)
+        Y_fwd = np.array([0], dtype=float)
     Opt_fwd = Info_2['opt'][:len(Y_fwd), 1]
     KneeOpt_zerocross_ref, InOut = zerocross_inout_region(Y_fwd, Opt_fwd)
     if KneeOpt_zerocross_ref >= len(X_fwd):
-        print(f"Warnung: KneeOpt_zerocross_ref ({KneeOpt_zerocross_ref}) ist außerhalb der Grenzen von X_fwd (Größe: {len(X_fwd)}).")
         KneeOpt_zerocross_ref = len(X_fwd) - 1
     KneeOpt_zerocross = X_fwd[KneeOpt_zerocross_ref]
     t_3end = time.time() - t_3
@@ -84,6 +86,11 @@ def Spikelet_Stat_knee_find_2nd_zerocross(MagDist, FuncList, Weight=None):
 
 
 def zerocross_inout_region(V, Pred):
+    # --- Fallback: Wenn V oder Pred leer sind, direkt zurück ---
+    if len(V) == 0 or len(Pred) == 0:
+        # z.B. KneeOpt_rel = 0 und leeres 2D-Array
+        return 0, np.zeros((0, 2))
+
     Vn = V - Pred
     In_pos = None
     Status = 0 if Vn[0] == 0 else (-1 if Vn[0] < 0 else 1)

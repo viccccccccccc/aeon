@@ -1,9 +1,11 @@
 import time
+import pdb
 
 import numpy as np
 from aeon.transformations.spikelet.sshist import sshist
 from aeon.transformations.spikelet.histx import histx
 from aeon.transformations.spikelet.histcounts import histcounts
+from aeon.transformations.spikelet.histcounts2 import histcounts2
 
 def Spikelet_Stat_decide_binsize_all(D):
     t_start = time.time()
@@ -11,7 +13,7 @@ def Spikelet_Stat_decide_binsize_all(D):
         BinN_shimasaki, edges_mid_shimasaki, Count_shimasaki = sshist(D)
         
     else:
-        Count_shimasaki, edges_mid_shimasaki = np.histogram(D)
+        Count_shimasaki, edges_mid_shimasaki = histcounts2(D)
         BinN_shimasaki = len(edges_mid_shimasaki)
     time_shimasaki = time.time() - t_start
 
@@ -53,3 +55,4 @@ def Spikelet_Stat_decide_binsize_all(D):
     ]
 
     return BinN_list, BinN_list_names, Time_list
+
