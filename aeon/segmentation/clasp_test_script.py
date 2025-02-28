@@ -763,9 +763,6 @@ if __name__ == "__main__":
     evaluation_data7 = deepcopy(evaluation_data_template)
     evaluation_data8 = deepcopy(evaluation_data_template)
 
-    
-    output_dir = r"C:\Users\Victor\Desktop\Uni\Bachelor\output"
-
     order = "spikelet_first"                # spikelet_first oder downsampling_first
     
     # run(False, "tssb", benchmarkNames, mewsImplementation, run_settings, evaluation_data, output_dir, "spikelet_first")
